@@ -22,7 +22,7 @@
             transition: border-color 0.3s;
         }
 
-        /* BUTON ANİMASYONLARI (Tıklama Hissi: Küçülme) */
+        /* BUTON ANİMASYONLARI */
         button:active { transform: scale(0.96); }
 
         /* Yapıştır Butonu */
@@ -45,7 +45,7 @@
         }
         .convert-btn:hover { background-color: #0b5ed7; }
 
-        /* HATA ANİMASYONU (Sallanma) */
+        /* HATA ANİMASYONU */
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -110,59 +110,49 @@
 </div>
 
 <script>
-    // Linkin son başarılı halini tutar
     var sonIslenenLink = "";
 
     function linkDonustur() {
         var inputElement = document.getElementById("driveLink");
-        var val = inputElement.value.trim(); // Boşlukları temizleyerek al
+        var val = inputElement.value.trim();
 
-        // 1. BOŞ KONTROLÜ
         if(val === "") { 
             hataAnimasyonu("Link Yazın!");
-            sonIslenenLink = ""; // Hata varsa hafızayı temizle ki tekrar deneyebilsin
+            sonIslenenLink = ""; 
             return; 
         } 
 
-        // 2. GEREKSİZ TIKLAMA ENGELİ (Eğer link değişmediyse ve zaten başarılıysa dur)
-        // Buradaki kritik nokta: Hata durumlarında sonIslenenLink'i sıfırladığımız için
-        // kullanıcı hatayı düzeltip bastığında buraya takılmayacak.
         if(val === sonIslenenLink) {
             return; 
         }
 
-        // 3. EKSİK HTTPS DÜZELTME
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
             val = "https://" + val;
-            inputElement.value = val; // Kutuyu güncelle
+            inputElement.value = val; 
         }
 
-        // 4. GEÇERSİZ FORMAT KONTROLÜ
         var idMatch = val.match(/\/d\/(.+?)\//);
         if (!idMatch) {
             hataAnimasyonu("Geçersiz Link!");
-            sonIslenenLink = ""; // Hata varsa hafızayı temizle
+            sonIslenenLink = ""; 
             return;
         }
 
-        // --- İŞLEM BAŞARILI ---
         var fileID = idMatch[1];
         var newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
 
         var finalDiv = document.getElementById("finalLink");
         finalDiv.innerText = newLink;
-        finalDiv.style.color = "#333"; // Yeni link üretilince rengi sıfırla
+        finalDiv.style.color = "#333"; 
 
         document.getElementById("previewImg").src = newLink;
         document.getElementById("resultArea").style.display = "block";
         
-        // Başarılı olduğu için bu linki hafızaya al
         sonIslenenLink = val;
 
         butonSifirla();
     }
 
-    // Kullanıcı elle yazı yazarsa hafıza sıfırlanmalı
     function hafizayiSifirla() {
         sonIslenenLink = "";
     }
@@ -189,7 +179,6 @@
             btn.style.backgroundColor = "#198754"; 
             btn.disabled = true; 
             
-            // Link metni de yeşil olsun
             finalDiv.style.color = "#198754"; 
 
             setTimeout(function(){ butonSifirla(); }, 1000);
@@ -213,16 +202,23 @@
             const text = await navigator.clipboard.readText();
             var processedText = text.trim();
 
+            // Eksik HTTPS tamamlama (Kutuya yazmadan önce düzelt)
             if (processedText.match(/\/d\/(.+?)\//) && !processedText.startsWith("http")) {
                 processedText = "https://" + processedText;
             }
 
+            // --- YENİ EKLENEN KONTROL: AYNI MI? ---
+            // Eğer kutudaki mevcut metin ile yapıştırılacak metin aynıysa işlem yapma.
+            if (inputAlani.value === processedText) {
+                return; // Yeşil yakma, animasyon yapma, çık.
+            }
+
             inputAlani.value = processedText;
             
-            // Yapıştırma yapıldığı an hafızayı sıfırlıyoruz ki
-            // "aynı linki yapıştırdı" diye takılmasın, akış devam etsin.
+            // Değişiklik olduğu için hafızayı sıfırla
             sonIslenenLink = ""; 
 
+            // Değişiklik oldu, o zaman yeşil yak
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 1500);
 
