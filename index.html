@@ -21,12 +21,10 @@
             border-right: none; height: 40px; box-sizing: border-box;
             transition: border-color 0.3s;
         }
+        /* Kutuya tıklandığında (focus) oluşan mavi çerçeve kalsın ama kodla odaklanınca rahatsız etmesin */
 
-        /* --- BUTON ANİMASYONLARI İÇİN ORTAK AYAR --- */
-        /* Butona basıldığında (active) hafifçe küçülsün */
-        button:active {
-            transform: scale(0.96); /* %96 boyutuna in */
-        }
+        /* BUTON ANİMASYONLARI (Tıklama Hissi) */
+        button:active { transform: scale(0.96); }
 
         /* Yapıştır Butonu */
         .paste-btn {
@@ -34,9 +32,7 @@
             border-top-right-radius: 4px; border-bottom-right-radius: 4px;
             cursor: pointer; width: 50px; height: 40px;
             display: flex; align-items: center; justify-content: center;
-            padding: 0;
-            /* Hem renk hem boyut değişimi için transition */
-            transition: background-color 0.2s, transform 0.1s; 
+            transition: background-color 0.2s, transform 0.1s; padding: 0;
         }
         .paste-btn:hover { background-color: #5c636a; }
         .paste-btn svg { width: 20px; height: 20px; fill: white; }
@@ -50,7 +46,7 @@
         }
         .convert-btn:hover { background-color: #0b5ed7; }
 
-        /* HATA ANİMASYONU (Sallanma Efekti) */
+        /* HATA ANİMASYONU */
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -58,7 +54,6 @@
             75% { transform: translateX(-5px); }
             100% { transform: translateX(0); }
         }
-
         .error-shake {
             animation: shake 0.3s ease-in-out;
             background-color: #dc3545 !important; 
@@ -75,13 +70,13 @@
             transition: background-color 0.3s, transform 0.1s;
         }
         .copy-btn:hover { background-color: #5c636a; }
-        /* Disabled olunca tıklama efekti olmasın */
         .copy-btn:disabled { cursor: default; opacity: 1; transform: none; }
 
         #finalLink { 
             user-select: auto; cursor: default; 
             background: #fff; padding: 8px; border: 1px solid #ddd; 
             border-radius: 4px; font-size: 13px; color: #333; 
+            transition: color 0.3s; /* Renk değişimi yumuşak olsun */
         }
     </style>
 </head>
@@ -116,36 +111,65 @@
 </div>
 
 <script>
+    // Global değişken: Son işlenen linki hafızada tutar
+    var sonIslenenLink = "";
+
     function linkDonustur() {
-        var inputLink = document.getElementById("driveLink").value;
+        var inputElement = document.getElementById("driveLink");
+        var val = inputElement.value.trim(); // Boşlukları temizle
         var btn = document.getElementById("btnConvert");
 
-        // Format Kontrolü
-        if(!inputLink || !inputLink.match(/\/d\/(.+?)\//)) { 
-            hataAnimasyonu();
+        // 1. BOŞ KONTROLÜ
+        if(val === "") { 
+            hataAnimasyonu("Link Yazın!");
             return; 
         } 
 
-        var idMatch = inputLink.match(/\/d\/(.+?)\//);
+        // 2. DEĞİŞİKLİK KONTROLÜ (Aynı linke tekrar basılmasın)
+        if(val === sonIslenenLink) {
+            return; // Hiçbir şey yapma
+        }
 
-        if (idMatch && idMatch[1]) {
-            var fileID = idMatch[1];
-            var newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
+        // 3. EKSİK HTTPS DÜZELTME (Manuel yazılanlar için de geçerli olsun)
+        // Eğer ID formatı uyuyor ama başında http yoksa ekle
+        if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
+            val = "https://" + val;
+            inputElement.value = val; // Kutuyu da güncelle
+        }
 
-            document.getElementById("finalLink").innerText = newLink;
-            document.getElementById("previewImg").src = newLink;
-            document.getElementById("resultArea").style.display = "block";
-            butonSifirla();
-        } 
+        // 4. FORMAT KONTROLÜ
+        var idMatch = val.match(/\/d\/(.+?)\//);
+        if (!idMatch) {
+            hataAnimasyonu("Geçersiz Link!");
+            return;
+        }
+
+        // --- İŞLEM BAŞARILI ---
+        var fileID = idMatch[1];
+        var newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
+
+        var finalDiv = document.getElementById("finalLink");
+        finalDiv.innerText = newLink;
+        finalDiv.style.color = "#333"; // Yeni link üretilince rengi siyaha/griye döndür
+
+        document.getElementById("previewImg").src = newLink;
+        document.getElementById("resultArea").style.display = "block";
+        
+        // Son işlenen linki güncelle
+        sonIslenenLink = val;
+
+        butonSifirla();
     }
 
-    function hataAnimasyonu() {
+    function hataAnimasyonu(mesaj) {
         var btn = document.getElementById("btnConvert");
-        var orjinalMetin = btn.innerText;
+        var orjinalMetin = "Dönüştür"; // Butonun orijinal metni sabit
 
+        // Animasyon ve renk sınıfını ekle
         btn.classList.add("error-shake");
-        btn.innerText = "Geçersiz Link!";
+        btn.innerText = mesaj;
 
+        // 1 Saniye sonra eski haline döndür
         setTimeout(function() {
             btn.classList.remove("error-shake");
             btn.innerText = orjinalMetin;
@@ -153,13 +177,18 @@
     }
 
     function kopyala() {
-        var textKutusu = document.getElementById("finalLink");
+        var finalDiv = document.getElementById("finalLink");
         var btn = document.getElementById("btnCopy");
 
-        navigator.clipboard.writeText(textKutusu.innerText).then(function() {
+        navigator.clipboard.writeText(finalDiv.innerText).then(function() {
+            // Buton İşlemleri
             btn.innerText = "Kopyalandı!";
             btn.style.backgroundColor = "#198754"; 
             btn.disabled = true; 
+            
+            // LİNK METNİ RENK DEĞİŞİMİ (Kalıcı Yeşil)
+            finalDiv.style.color = "#198754"; 
+
             setTimeout(function(){ butonSifirla(); }, 1000);
         }, function(err) {
             alert("Kopyalanamadı: " + err);
@@ -171,29 +200,43 @@
         btn.innerText = "Linki Kopyala";
         btn.style.backgroundColor = "#6c757d"; 
         btn.disabled = false; 
+        // Not: Link metninin rengini (#finalLink) burada sıfırlamıyoruz, 
+        // kullanıcı yeni link dönüştürene kadar yeşil kalsın istendi.
     }
 
     async function yapistir() {
         var inputAlani = document.getElementById("driveLink");
         var pasteBtn = document.getElementById("btnPaste");
 
-        inputAlani.focus(); 
+        // DİKKAT: inputAlani.focus() komutunu buradan kaldırdık.
+        // Böylece yapıştır'a basınca kutunun çerçevesi yanmayacak.
 
         try {
             const text = await navigator.clipboard.readText();
-            inputAlani.value = text;
-            
-            // Yeşil yanma efekti
-            pasteBtn.style.backgroundColor = "#198754"; 
-            setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 500);
+            var processedText = text.trim();
 
-            // Format doğruysa dönüştür
-            if (text.match(/\/d\/(.+?)\//)) {
+            // Eksik HTTPS tamamlama
+            if (processedText.match(/\/d\/(.+?)\//) && !processedText.startsWith("http")) {
+                processedText = "https://" + processedText;
+            }
+
+            inputAlani.value = processedText;
+            
+            // Yeşil yanma süresi 1.5 saniye (1500ms) yapıldı
+            pasteBtn.style.backgroundColor = "#198754"; 
+            setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 1500);
+
+            // Format doğruysa otomatik dönüştür
+            // (Burada sonIslenenLink kontrolüne takılmasın diye manuel çağrı yapıyoruz,
+            // ama linkDonustur içindeki kontrolü aşmak için sonIslenenLink'i sıfırlamıyoruz,
+            // çünkü yeni bir link yapıştırıldıysa zaten farklıdır.)
+            if (processedText.match(/\/d\/(.+?)\//)) {
                 linkDonustur();
             }
 
         } catch (err) {
             console.error("Hata:", err);
+            // Hata durumunda (izin yoksa) kutuyu temizle, kullanıcı elle girsin
             inputAlani.value = "";
         }
     }
