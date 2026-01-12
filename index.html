@@ -54,7 +54,8 @@
         .copy-btn:disabled { cursor: default; opacity: 1; }
 
         #finalLink { 
-            user-select: all; -webkit-user-select: all; cursor: pointer; 
+            /* Artık tıklayınca seçilmesin diye user-select stilini kaldırdım veya auto yaptım */
+            user-select: auto; cursor: default; 
             background: #fff; padding: 8px; border: 1px solid #ddd; 
             border-radius: 4px; font-size: 13px; color: #333; 
         }
@@ -68,7 +69,7 @@
     <label class="label">Normal Drive Linki:</label>
     
     <div class="input-group">
-        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/....">
+        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/...." onclick="this.select()">
         
         <button class="paste-btn" id="btnPaste" onclick="yapistir()" title="Panodan Yapıştır">
             <svg viewBox="0 0 24 24">
@@ -81,7 +82,7 @@
 
     <div class="result-box" id="resultArea">
         <label class="label">Direkt Resim Linkin:</label>
-        <div id="finalLink" onclick="secimiBaslat(this)"></div>
+        <div id="finalLink"></div>
         <button id="btnCopy" class="copy-btn" onclick="kopyala()">Linki Kopyala</button>
         
         <br><br>
@@ -91,10 +92,9 @@
 </div>
 
 <script>
-    // Link Dönüştürme Fonksiyonu
     function linkDonustur() {
         var inputLink = document.getElementById("driveLink").value;
-        if(!inputLink) { return; } // Boşsa tepki verme
+        if(!inputLink) { return; } 
 
         var idMatch = inputLink.match(/\/d\/(.+?)\//);
 
@@ -106,13 +106,9 @@
             document.getElementById("previewImg").src = newLink;
             document.getElementById("resultArea").style.display = "block";
             butonSifirla();
-        } else {
-            // Sadece manuel basıldığında uyarı ver, otomatik yapıştırmada sessiz kal
-            // (Bu kontrolü çağıran yere bırakıyoruz, burası standart çalışır)
-        }
+        } 
     }
 
-    // Kopyalama Fonksiyonu
     function kopyala() {
         var textKutusu = document.getElementById("finalLink");
         var btn = document.getElementById("btnCopy");
@@ -134,7 +130,6 @@
         btn.disabled = false; 
     }
 
-    // --- AKILLI YAPIŞTIRMA VE OTO-DÖNÜŞTÜRME ---
     async function yapistir() {
         var inputAlani = document.getElementById("driveLink");
         var pasteBtn = document.getElementById("btnPaste");
@@ -145,28 +140,20 @@
             const text = await navigator.clipboard.readText();
             inputAlani.value = text;
             
-            // Başarılı yapıştırma efekti (Yeşil)
+            // Tüm metni seç (Yapıştırıldıktan sonra da seçili kalsın ki hemen yenisiyle değiştirilebilsin)
+            inputAlani.select();
+            
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 500);
 
-            // ÖNEMLİ: Format Kontrolü ve Otomatik Tetikleme
-            // Eğer yapıştırılan metin bir Drive linki formatındaysa direkt dönüştür
             if (text.match(/\/d\/(.+?)\//)) {
                 linkDonustur();
             }
 
         } catch (err) {
-            console.error("Panoya erişilemedi: ", err);
-            // Hata olursa kutuyu temizler, kullanıcı elle yapıştırır
+            console.error("Hata:", err);
             inputAlani.value = "";
         }
-    }
-    
-    function secimiBaslat(element) {
-        var range = document.createRange();
-        range.selectNodeContents(element);
-        window.getSelection().removeAllRanges();
-        window.getSelection().addRange(range);
     }
 </script>
 
