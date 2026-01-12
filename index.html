@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Gallery Manager</title>
+    <title>Drive Gallery Manager Pro</title>
     <style>
         /* --- TEMEL AYARLAR --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
@@ -65,7 +65,7 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             overflow: hidden;
-            aspect-ratio: 1; /* Kare olması için */
+            aspect-ratio: 1; 
             background: #eee;
             cursor: zoom-in;
             transition: transform 0.2s, border-color 0.2s;
@@ -75,13 +75,11 @@
             width: 100%; height: 100%; object-fit: cover; display: block;
         }
         
-        /* Aktif (Son Eklenen) Resim İşaretlemesi */
         .gallery-item.active-item {
             border: 3px solid #198754;
             box-shadow: 0 0 10px rgba(25, 135, 84, 0.3);
         }
 
-        /* Resim Üzerindeki Hızlı Kopyala Butonu */
         .overlay-copy-btn {
             position: absolute;
             top: 5px; right: 5px;
@@ -101,13 +99,8 @@
 
         /* --- GALERİ KONTROL PANELİ (BATCH) --- */
         .batch-controls {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            display: none; /* JS ile açılacak */
+            margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center; display: none; 
         }
         .btn-outline-danger {
             background: white; border: 1px solid #dc3545; color: #dc3545; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 13px;
@@ -119,13 +112,16 @@
         }
         .btn-primary-soft:hover { background: #0d6efd; color: white; }
 
-        /* --- MODAL (LIGHTBOX & DETAILS) --- */
+        /* --- LIGHTBOX (TAM EKRAN) --- */
         .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; 
-            overflow: auto; background-color: rgba(0,0,0,0.9); backdrop-filter: blur(4px);
+            display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; 
+            overflow: auto; backdrop-filter: blur(4px);
         }
+        /* Detaylar Modalı için Z-Index */
+        #detailsModal { z-index: 1000; background-color: rgba(0,0,0,0.6); }
+        /* Lightbox Modalı için Z-Index (Daha yüksek olmalı ki üstte çıksın) */
+        #lightboxModal { z-index: 2000; background-color: rgba(0,0,0,0.95); }
         
-        /* Lightbox İçerik */
         .lightbox-container {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
@@ -134,16 +130,31 @@
             max-width: 90%; max-height: 85vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
         
-        /* Lightbox Kontrolleri */
+        /* NAVIGASYON BUTONLARI (DÜZELTİLDİ) */
         .lb-btn {
-            position: absolute; background: rgba(255,255,255,0.1); color: white; border: none;
-            cursor: pointer; padding: 20px; font-size: 30px; border-radius: 5px; transition: background 0.2s;
-            top: 50%; transform: translateY(-50%);
+            position: absolute; 
+            background: rgba(255,255,255,0.15); 
+            color: white; border: none;
+            cursor: pointer; 
+            padding: 20px; 
+            font-size: 30px; 
+            border-radius: 5px; 
+            top: 50%; 
+            /* Y ekseninde %50 yukarı alarak tam ortala */
+            transform: translateY(-50%); 
+            transition: background 0.2s, transform 0.1s;
+            /* Seçimi engelle ki hızlı tıklayınca bozulmasın */
+            user-select: none; 
+            -webkit-user-select: none;
         }
-        .lb-btn:hover { background: rgba(255,255,255,0.3); }
+        .lb-btn:hover { background: rgba(255,255,255,0.4); }
+        /* Active durumunda Y eksenini sabit tut, sadece scale et (Zıplamayı önler) */
+        .lb-btn:active { transform: translateY(-50%) scale(0.9); }
+        
         .lb-prev { left: 20px; }
         .lb-next { right: 20px; }
         
+        /* Kopyala Butonu */
         .lb-copy {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             background: #fd7e14; color: white; padding: 10px 25px; border-radius: 20px; border: none;
@@ -153,8 +164,20 @@
         .lb-copy:hover { background: #e36906; }
         .lb-copy:active { transform: translateX(-50%) scale(0.95); }
 
+        /* Sil Butonu (Lightbox) */
+        .lb-trash {
+            position: absolute; bottom: 30px; right: 30px;
+            background: rgba(220, 53, 69, 0.8); color: white;
+            width: 45px; height: 45px; border-radius: 50%; border: none;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: background 0.2s, transform 0.1s;
+        }
+        .lb-trash:hover { background: #dc3545; }
+        .lb-trash:active { transform: scale(0.9); }
+        .lb-trash svg { width: 20px; height: 20px; fill: white; }
+
         .close-modal {
-            position: absolute; top: 20px; right: 30px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 1002;
+            position: absolute; top: 20px; right: 30px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 2002;
         }
 
         /* --- DETAY TABLOSU MODALI --- */
@@ -162,18 +185,27 @@
             background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888;
             width: 80%; max-width: 800px; border-radius: 8px; position: relative; max-height: 90vh; overflow-y: auto;
         }
-        .details-modal-content h3 { margin-top: 0; color: #333; }
+        .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .close-details {
             position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;
         }
         .close-details:hover { color: black; }
         
         table.link-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
-        table.link-table th, table.link-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        table.link-table th, table.link-table td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: middle; }
         table.link-table th { background-color: #f2f2f2; font-weight: 600; }
-        .tbl-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: zoom-in; }
-        .tbl-btn { background: #6c757d; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .tbl-thumb { width: 50px; height: 50px; object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; }
+        
+        .tbl-btn { background: #6c757d; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 5px; }
         .tbl-btn:hover { background: #5c636a; }
+        
+        .btn-danger-sm { background: #dc3545; color: white; border: none; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-danger-sm:hover { background: #bb2d3b; }
+        
+        .btn-copy-all {
+            background: #198754; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px;
+        }
+        .btn-copy-all:hover { background: #157347; }
 
     </style>
 </head>
@@ -185,20 +217,31 @@
         <button class="lb-btn lb-prev" onclick="changeSlide(-1)">&#10094;</button>
         <img class="lightbox-img" id="lbImage">
         <button class="lb-btn lb-next" onclick="changeSlide(1)">&#10095;</button>
-        <button class="lb-copy" id="lbCopyBtn" onclick="copyFromLightbox()">Linki Kopyala</button>
+        
+        <button class="lb-copy" id="lbCopyBtn" onclick="copyFromLightbox()" title="Kısayol: C">Linki Kopyala</button>
+        
+        <button class="lb-trash" onclick="deleteFromLightbox()" title="Sil (Kısayol: Delete)">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+        </button>
     </div>
 </div>
 
-<div id="detailsModal" class="modal" style="background-color: rgba(0,0,0,0.6);">
+<div id="detailsModal" class="modal">
     <div class="details-modal-content">
         <span class="close-details" onclick="closeDetails()">&times;</span>
-        <h3 data-lang="modalTitle">Oluşturulan Linkler</h3>
+        <div class="details-header">
+            <h3 data-lang="modalTitle" style="margin:0;">Oluşturulan Linkler</h3>
+            <button class="btn-copy-all" onclick="copyAllLinks()">
+                <svg style="width:16px;height:16px;fill:white" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                <span data-lang="btnCopyAll">Tümünü Kopyala</span>
+            </button>
+        </div>
         <table class="link-table">
             <thead>
                 <tr>
-                    <th data-lang="thImage">Resim</th>
+                    <th data-lang="thImage" style="width: 60px;">Resim</th>
                     <th data-lang="thDirect">Direkt Link</th>
-                    <th data-lang="thAction">İşlem</th>
+                    <th data-lang="thAction" style="width: 140px;">İşlem</th>
                 </tr>
             </thead>
             <tbody id="detailsTableBody">
@@ -219,7 +262,7 @@
             <li onclick="selectLang('de')">Deutsch</li>
             <li onclick="selectLang('es')">Español</li>
             <li onclick="selectLang('fr')">Français</li>
-            </ul>
+        </ul>
     </div>
 
     <h3 style="margin-top:0; padding-right: 80px;" data-lang="title">Google Drive Resim Linki Dönüştürücü</h3>
@@ -237,7 +280,6 @@
     <div id="galleryArea">
         <label class="label" data-lang="labelGallery">Oluşturulan Resimler:</label>
         <div class="gallery-grid" id="galleryGrid"></div>
-        
         <div class="batch-controls" id="batchControls">
             <button class="btn-primary-soft" onclick="showDetails()" data-lang="btnDetails">Detaylı Liste</button>
             <button class="btn-outline-danger" onclick="clearGallery()" data-lang="btnClear">Tümünü Temizle</button>
@@ -246,120 +288,85 @@
 </div>
 
 <script>
-    // --- VERİ & ÇEVİRİ ---
-    let history = []; // Tüm resimlerin saklandığı dizi
+    let history = []; 
     let currentLang = 'tr';
     let dinamikModAktif = false; 
-    let activeLightboxIndex = 0; // Lightbox'ta hangi resimdeyiz?
+    let activeLightboxIndex = 0; 
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
     const translations = {
-        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "https://drive.google.com/file/d/....", btnConvert: "Dönüştür", labelGallery: "Oluşturulan Resimler:", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Linki Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem" },
-        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste your link here...", btnConvert: "Convert", labelGallery: "Generated Images:", btnDetails: "Detailed List", btnClear: "Clear All", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy Link", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action" },
-        de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Link hier einfügen...", btnConvert: "Umwandeln", labelGallery: "Generierte Bilder:", btnDetails: "Detaillierte Liste", btnClear: "Alles löschen", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", btnCopy: "Link kopieren", modalTitle: "Generierte Links", thImage: "Bild", thDirect: "Direktlink", thAction: "Aktion" },
-        fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez votre lien ici...", btnConvert: "Convertir", labelGallery: "Images générées :", btnDetails: "Liste détaillée", btnClear: "Tout effacer", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", btnCopy: "Copier le lien", modalTitle: "Liens générés", thImage: "Image", thDirect: "Lien direct", thAction: "Action" },
-        es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega tu enlace aquí...", btnConvert: "Convertir", labelGallery: "Imágenes Generadas:", btnDetails: "Lista Detallada", btnClear: "Borrar Todo", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", btnCopy: "Copiar Enlace", modalTitle: "Enlaces Generados", thImage: "Imagen", thDirect: "Enlace Directo", thAction: "Acción" }
+        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "https://drive.google.com/file/d/....", btnConvert: "Dönüştür", labelGallery: "Oluşturulan Resimler:", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Linki Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tümünü Kopyala" },
+        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste your link here...", btnConvert: "Convert", labelGallery: "Generated Images:", btnDetails: "Detailed List", btnClear: "Clear All", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy Link", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All" },
+        de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Link hier einfügen...", btnConvert: "Umwandeln", labelGallery: "Generierte Bilder:", btnDetails: "Detaillierte Liste", btnClear: "Alles löschen", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", btnCopy: "Link kopieren", modalTitle: "Generierte Links", thImage: "Bild", thDirect: "Direktlink", thAction: "Aktion", btnDelete: "Löschen", btnCopyAll: "Alles Kopieren" },
+        fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez votre lien ici...", btnConvert: "Convertir", labelGallery: "Images générées :", btnDetails: "Liste détaillée", btnClear: "Tout effacer", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", btnCopy: "Copier le lien", modalTitle: "Liens générés", thImage: "Image", thDirect: "Lien direct", thAction: "Action", btnDelete: "Supprimer", btnCopyAll: "Tout Copier" },
+        es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega tu enlace aquí...", btnConvert: "Convertir", labelGallery: "Imágenes Generadas:", btnDetails: "Lista Detallada", btnClear: "Borrar Todo", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", btnCopy: "Copiar Enlace", modalTitle: "Enlaces Generados", thImage: "Imagen", thDirect: "Enlace Directo", thAction: "Acción", btnDelete: "Eliminar", btnCopyAll: "Copiar Todo" }
     };
 
-    // --- TEMEL FONKSİYONLAR ---
-    function toggleLangMenu(event) { event.stopPropagation(); var list = document.getElementById("langList"); list.style.display = (list.style.display === "block") ? "none" : "block"; }
-    function selectLang(code) { currentLang = code; document.getElementById("currentLangLabel").innerText = code.toUpperCase(); document.getElementById("langList").style.display = "none"; applyTranslations(); }
-    document.addEventListener('click', function(event) { var list = document.getElementById("langList"); var btn = document.querySelector(".lang-btn"); if (list.style.display === "block" && !list.contains(event.target) && !btn.contains(event.target)) { list.style.display = "none"; } });
+    function toggleLangMenu(e) { e.stopPropagation(); var l = document.getElementById("langList"); l.style.display = (l.style.display === "block") ? "none" : "block"; }
+    function selectLang(c) { currentLang = c; document.getElementById("currentLangLabel").innerText = c.toUpperCase(); document.getElementById("langList").style.display = "none"; applyTranslations(); }
+    document.addEventListener('click', function(e) { var l = document.getElementById("langList"); var b = document.querySelector(".lang-btn"); if (l.style.display === "block" && !l.contains(e.target) && !b.contains(e.target)) { l.style.display = "none"; } });
 
     function applyTranslations() {
         const t = translations[currentLang];
         document.querySelectorAll('[data-lang]').forEach(el => { if (t[el.getAttribute('data-lang')]) el.innerText = t[el.getAttribute('data-lang')]; });
         document.getElementById('driveLink').placeholder = t.placeholder;
-        
-        // Lightbox butonu
         let lbCopy = document.getElementById('lbCopyBtn');
         if(!lbCopy.innerText.includes("!")) lbCopy.innerText = t.btnCopy;
-        
         var btnConvert = document.getElementById('btnConvert');
         if (!btnConvert.classList.contains('error-shake')) btnConvert.innerText = t.btnConvert;
+        if(document.getElementById("detailsModal").style.display === "block") showDetails(); // Tabloyu güncelle
     }
 
-    // --- DÖNÜŞTÜRME MANTIĞI ---
     function linkDonustur() {
         var btn = document.getElementById("btnConvert");
         if(btn.classList.contains('passive')) return;
         var inputElement = document.getElementById("driveLink");
         var val = inputElement.value.trim();
         const t = translations[currentLang];
-
         if(val === "") { hataAnimasyonu(t.errEmpty); return; }
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) { val = "https://" + val; inputElement.value = val; }
-
         var idMatch = val.match(driveRegex);
         if (!idMatch) { hataAnimasyonu(t.errInvalid); return; }
-
         var fileID = idMatch[1];
         var newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
-
-        // --- GALERİ MANTIĞI: TEKRAR KONTROLÜ ---
-        // Eğer bu ID zaten varsa, eskisini sil (en sona eklemek için)
         history = history.filter(item => item.id !== fileID);
-
-        // Yeni objeyi ekle
         history.push({ id: fileID, directLink: newLink, originalLink: val });
-
-        // Galeriyi Yenile
         renderGallery();
-
-        // Buton Durumu
-        dinamikModAktif = false; 
-        btn.classList.add("success-lock");
+        dinamikModAktif = false; btn.classList.add("success-lock");
     }
 
-    // --- GALERİ RENDER (EKRANA BASMA) ---
     function renderGallery() {
         const grid = document.getElementById("galleryGrid");
         const area = document.getElementById("galleryArea");
         const batchCtrl = document.getElementById("batchControls");
-        
-        grid.innerHTML = ""; // Temizle
-        
+        grid.innerHTML = ""; 
         if(history.length > 0) {
             area.style.display = "block";
-            // 1'den fazla resim varsa toplu işlemleri göster
             batchCtrl.style.display = (history.length > 1) ? "flex" : "none";
         } else {
-            area.style.display = "none";
-            return;
+            area.style.display = "none"; return;
         }
-
         history.forEach((item, index) => {
-            let div = document.createElement("div");
-            div.className = "gallery-item";
-            
-            // Son eklenen (en sondaki) aktif olsun
+            let div = document.createElement("div"); div.className = "gallery-item";
             if(index === history.length - 1) div.classList.add("active-item");
-
-            // Resim
-            let img = document.createElement("img");
-            img.src = item.directLink;
-            img.onclick = () => openLightbox(index);
-
-            // Overlay Kopyala Butonu (Zincir ikonu)
-            let btn = document.createElement("div");
-            btn.className = "overlay-copy-btn";
+            let img = document.createElement("img"); img.src = item.directLink; img.onclick = () => openLightbox(index);
+            let btn = document.createElement("div"); btn.className = "overlay-copy-btn";
             btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>';
             btn.onclick = (e) => { e.stopPropagation(); copyDirect(item.directLink, btn); };
-
-            div.appendChild(img);
-            div.appendChild(btn);
-            grid.appendChild(div);
+            div.appendChild(img); div.appendChild(btn); grid.appendChild(div);
         });
+        // Eğer detay tablosu açıksa onu da güncelle
+        if(document.getElementById("detailsModal").style.display === "block") {
+            showDetails();
+        }
     }
 
     function clearGallery() {
-        history = [];
-        renderGallery();
+        history = []; renderGallery();
         document.getElementById("driveLink").value = "";
         document.getElementById("btnConvert").classList.remove("success-lock");
     }
 
-    // --- LIGHTBOX (TAM EKRAN) ---
     function openLightbox(index) {
         activeLightboxIndex = index;
         updateLightboxContent();
@@ -373,19 +380,18 @@
     }
 
     function updateLightboxContent() {
+        if (history.length === 0) { closeLightbox(); return; }
+        if (activeLightboxIndex >= history.length) activeLightboxIndex = 0;
         let item = history[activeLightboxIndex];
         document.getElementById("lbImage").src = item.directLink;
-        
-        // Buton metnini resetle
         const t = translations[currentLang];
         let btn = document.getElementById("lbCopyBtn");
-        btn.innerText = t.btnCopy;
-        btn.style.backgroundColor = "#fd7e14";
+        btn.innerText = t.btnCopy; btn.style.backgroundColor = "#fd7e14";
     }
 
     function changeSlide(direction) {
+        if(history.length === 0) return;
         activeLightboxIndex += direction;
-        // Döngüsel geçiş (sonuncudan ilkine, ilkinden sonuncuya)
         if (activeLightboxIndex >= history.length) activeLightboxIndex = 0;
         if (activeLightboxIndex < 0) activeLightboxIndex = history.length - 1;
         updateLightboxContent();
@@ -395,79 +401,101 @@
         if (e.key === "ArrowRight") changeSlide(1);
         if (e.key === "ArrowLeft") changeSlide(-1);
         if (e.key === "Escape") closeLightbox();
+        if (e.key.toLowerCase() === "c") copyFromLightbox();
+        if (e.key === "Delete" || e.key === "Backspace") deleteFromLightbox();
     }
 
     function copyFromLightbox() {
         let link = history[activeLightboxIndex].directLink;
         let btn = document.getElementById("lbCopyBtn");
         const t = translations[currentLang];
-        
         navigator.clipboard.writeText(link).then(() => {
-            btn.innerText = t.msgCopied;
-            btn.style.backgroundColor = "#198754";
-            setTimeout(() => {
-                 btn.innerText = t.btnCopy;
-                 btn.style.backgroundColor = "#fd7e14";
-            }, 1500);
+            btn.innerText = t.msgCopied; btn.style.backgroundColor = "#198754";
+            setTimeout(() => { btn.innerText = t.btnCopy; btn.style.backgroundColor = "#fd7e14"; }, 1500);
         });
     }
 
-    // --- DETAY TABLOSU ---
+    // --- YENİ SİLME FONKSİYONU (LIGHTBOX) ---
+    function deleteFromLightbox() {
+        if(history.length === 0) return;
+        // Diziden sil
+        history.splice(activeLightboxIndex, 1);
+        
+        // Eğer sildikten sonra index liste dışına çıkarsa (son elemanı sildiysek)
+        if(activeLightboxIndex >= history.length) {
+            activeLightboxIndex = history.length - 1;
+        }
+
+        // Arka planı güncelle
+        renderGallery();
+        
+        // Lightbox'ı güncelle (veya kapat)
+        if(history.length === 0) {
+            closeLightbox();
+        } else {
+            updateLightboxContent();
+        }
+    }
+
     function showDetails() {
         const tbody = document.getElementById("detailsTableBody");
         const t = translations[currentLang];
         tbody.innerHTML = "";
-
-        history.forEach(item => {
+        history.forEach((item, index) => {
             let row = document.createElement("tr");
             
-            // 1. Hücre: Resim (Thumb)
             let cellImg = document.createElement("td");
             let img = document.createElement("img");
-            img.src = item.directLink;
-            img.className = "tbl-thumb";
-            // Tablodaki resme tıklayınca o resmi lightbox'ta aç (indexini bulup)
-            let idx = history.indexOf(item);
-            img.onclick = () => { closeDetails(); openLightbox(idx); };
+            img.src = item.directLink; img.className = "tbl-thumb";
+            img.onclick = () => { /* Lightbox'ı aç ama detayları kapatma */ openLightbox(index); };
             cellImg.appendChild(img);
 
-            // 2. Hücre: Link (Kısaltılmış)
             let cellLink = document.createElement("td");
             cellLink.innerText = item.directLink.substring(0, 40) + "...";
             cellLink.style.wordBreak = "break-all";
 
-            // 3. Hücre: Kopyala
             let cellAct = document.createElement("td");
-            let btn = document.createElement("button");
-            btn.className = "tbl-btn";
-            btn.innerText = t.btnCopy;
-            btn.onclick = () => {
+            let btnCopy = document.createElement("button");
+            btnCopy.className = "tbl-btn"; btnCopy.innerText = t.btnCopy;
+            btnCopy.onclick = () => {
                 navigator.clipboard.writeText(item.directLink).then(() => {
-                    btn.innerText = t.msgCopied;
-                    btn.style.backgroundColor = "#198754";
-                    setTimeout(() => { btn.innerText = t.btnCopy; btn.style.backgroundColor = "#6c757d"; }, 1000);
+                    btnCopy.innerText = t.msgCopied; btnCopy.style.backgroundColor = "#198754";
+                    setTimeout(() => { btnCopy.innerText = t.btnCopy; btnCopy.style.backgroundColor = "#6c757d"; }, 1000);
                 });
             };
-            cellAct.appendChild(btn);
+            
+            let btnDel = document.createElement("button");
+            btnDel.className = "btn-danger-sm"; btnDel.innerText = t.btnDelete;
+            btnDel.onclick = () => {
+                history.splice(index, 1);
+                renderGallery(); // Tabloyu da tetikler
+                if(history.length === 0) closeDetails();
+            };
 
-            row.appendChild(cellImg);
-            row.appendChild(cellLink);
-            row.appendChild(cellAct);
+            cellAct.appendChild(btnCopy);
+            cellAct.appendChild(btnDel);
+            row.appendChild(cellImg); row.appendChild(cellLink); row.appendChild(cellAct);
             tbody.appendChild(row);
         });
-
         document.getElementById("detailsModal").style.display = "block";
     }
 
-    function closeDetails() { document.getElementById("detailsModal").style.display = "none"; }
+    function copyAllLinks() {
+        const t = translations[currentLang];
+        let allLinks = history.map(item => item.directLink).join("\n");
+        navigator.clipboard.writeText(allLinks).then(() => {
+            let btn = document.querySelector(".btn-copy-all span");
+            let oldText = btn.innerText;
+            btn.innerText = t.msgCopied;
+            setTimeout(() => { btn.innerText = t.btnCopyAll || "Tümünü Kopyala"; }, 1500);
+        });
+    }
 
-    // --- YARDIMCI ---
+    function closeDetails() { document.getElementById("detailsModal").style.display = "none"; }
     function copyDirect(link, btnElement) {
         navigator.clipboard.writeText(link).then(() => {
-            // İkonu yeşil yapıp geri döndür
             let originalBg = btnElement.style.background;
-            btnElement.style.background = "#198754";
-            btnElement.style.color = "white";
+            btnElement.style.background = "#198754"; btnElement.style.color = "white";
             setTimeout(() => { btnElement.style.background = ""; btnElement.style.color = ""; }, 500);
         });
     }
@@ -478,7 +506,6 @@
         var val = document.getElementById("driveLink").value.trim();
         var btn = document.getElementById("btnConvert");
         const t = translations[currentLang];
-        
         if (val === "") { btn.classList.add("passive"); btn.innerText = t.errEmpty; return; }
         if (!val.match(driveRegex)) { btn.classList.add("passive"); btn.innerText = t.errInvalid; } 
         else { btn.classList.remove("passive"); btn.innerText = t.btnConvert; }
