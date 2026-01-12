@@ -54,7 +54,6 @@
         .copy-btn:disabled { cursor: default; opacity: 1; }
 
         #finalLink { 
-            /* Artık tıklayınca seçilmesin diye user-select stilini kaldırdım veya auto yaptım */
             user-select: auto; cursor: default; 
             background: #fff; padding: 8px; border: 1px solid #ddd; 
             border-radius: 4px; font-size: 13px; color: #333; 
@@ -140,8 +139,8 @@
             const text = await navigator.clipboard.readText();
             inputAlani.value = text;
             
-            // Tüm metni seç (Yapıştırıldıktan sonra da seçili kalsın ki hemen yenisiyle değiştirilebilsin)
-            inputAlani.select();
+            // BURADAN "select()" KOMUTUNU KALDIRDIM.
+            // Artık yapıştırınca metin seçili kalmayacak.
             
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 500);
