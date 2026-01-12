@@ -29,7 +29,8 @@
             transition: border-color 0.3s; font-size: 14px;
         }
 
-        /* BUTON ANİMASYONLARI (Genel) */
+        /* BUTON ANİMASYONLARI (GENEL) */
+        /* scale(0.96) ile hafifçe küçülür, süreyi 0.2s yaptık (daha yumuşak) */
         button:active { transform: scale(0.96); }
 
         /* Yapıştır Butonu */
@@ -38,7 +39,7 @@
             border-top-right-radius: 4px; border-bottom-right-radius: 4px;
             cursor: pointer; width: 50px; height: 45px;
             display: flex; align-items: center; justify-content: center;
-            transition: background-color 0.2s, transform 0.1s; padding: 0;
+            transition: background-color 0.2s, transform 0.2s; padding: 0;
         }
         .paste-btn:hover { background-color: #5c636a; }
         .paste-btn svg { width: 22px; height: 22px; fill: white; }
@@ -48,7 +49,7 @@
             background-color: #0d6efd; color: white; padding: 12px 20px; 
             border: none; border-radius: 4px; cursor: pointer; width: 100%; 
             font-size: 15px; margin-bottom: 5px; font-weight: bold;
-            transition: background-color 0.3s, transform 0.1s;
+            transition: background-color 0.3s, transform 0.2s; /* Süre uzatıldı */
         }
         .convert-btn:hover { background-color: #0b5ed7; }
         
@@ -78,29 +79,31 @@
         /* KOPYALA BUTONU (SAĞA YASLI) */
         .copy-btn { 
             margin-top: 10px; 
-            background-color: #fd7e14; /* Turuncu Başlangıç */
+            background-color: #fd7e14; 
             color: white; border: none;
             padding: 8px 15px; border-radius: 4px; font-size: 13px; cursor: pointer;
             min-width: 140px; 
             
-            /* --- SAĞA YASLAMA KODLARI --- */
-            display: block;      /* Blok eleman yap */
-            margin-left: auto;   /* Sol boşluğu otomatik yapıp sağa it */
-            margin-right: 0;     /* Sağ boşluğu sıfırla */
+            /* Sağa yaslama */
+            display: block;      
+            margin-left: auto;   
+            margin-right: 0;     
             
             text-align: center;
-            transition: background-color 0.3s, transform 0.1s;
+            /* transform süresini 0.2s yaptık ki tıklama daha yumuşak olsun */
+            transition: background-color 0.3s, transform 0.2s; 
+            outline: none; /* Tıklayınca oluşan mavi çerçeveyi kaldırır */
         }
         .copy-btn:hover { background-color: #e36906; } 
         
-        /* GÖZ KIRPMA ANİMASYONU (Metin İçin) */
+        /* YENİ GÖZ KIRPMA ANİMASYONU (Daha Yumuşak) */
         @keyframes blinkText {
             0% { opacity: 1; }
-            50% { opacity: 0; }
+            50% { opacity: 0.3; } /* Tamamen kaybolmasın, silikleşsin */
             100% { opacity: 1; }
         }
         .text-blink {
-            animation: blinkText 0.15s ease-in-out;
+            animation: blinkText 0.3s ease-in-out; /* Süre biraz uzatıldı */
         }
 
         #finalLink { 
@@ -190,12 +193,10 @@
         document.getElementById('driveLink').placeholder = t.placeholder;
         document.getElementById('btnPaste').title = t.pasteTooltip;
         
-        // Eğer kopyala butonu yeşil değilse orijinal metni koy
         var btnCopy = document.getElementById('btnCopy');
         if(btnCopy.style.backgroundColor !== "rgb(25, 135, 84)" && btnCopy.style.backgroundColor !== "#198754") {
              btnCopy.innerText = t.btnCopy;
         } else {
-             // Yeşilse de o dilin "Kopyalandı"sını koy
              btnCopy.innerText = t.msgCopied;
         }
 
@@ -303,11 +304,10 @@
         navigator.clipboard.writeText(finalDiv.innerText).then(function() {
             btn.innerText = t.msgCopied;
             btn.style.backgroundColor = "#198754"; 
-            // disabled = true KALDIRILDI
             
             finalDiv.style.color = "#198754"; 
 
-            // GÖZ KIRPMA EFEKTİ
+            // GÖZ KIRPMA EFEKTİ (Daha yumuşak hali)
             btn.classList.remove("text-blink");
             void btn.offsetWidth; 
             btn.classList.add("text-blink");
