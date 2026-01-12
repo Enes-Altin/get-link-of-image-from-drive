@@ -21,9 +21,8 @@
             border-right: none; height: 40px; box-sizing: border-box;
             transition: border-color 0.3s;
         }
-        /* Kutuya tıklandığında (focus) oluşan mavi çerçeve kalsın ama kodla odaklanınca rahatsız etmesin */
 
-        /* BUTON ANİMASYONLARI (Tıklama Hissi) */
+        /* BUTON ANİMASYONLARI (Tıklama Hissi: Küçülme) */
         button:active { transform: scale(0.96); }
 
         /* Yapıştır Butonu */
@@ -46,7 +45,7 @@
         }
         .convert-btn:hover { background-color: #0b5ed7; }
 
-        /* HATA ANİMASYONU */
+        /* HATA ANİMASYONU (Sallanma) */
         @keyframes shake {
             0% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -76,7 +75,7 @@
             user-select: auto; cursor: default; 
             background: #fff; padding: 8px; border: 1px solid #ddd; 
             border-radius: 4px; font-size: 13px; color: #333; 
-            transition: color 0.3s; /* Renk değişimi yumuşak olsun */
+            transition: color 0.3s; 
         }
     </style>
 </head>
@@ -88,7 +87,7 @@
     <label class="label">Normal Drive Linki:</label>
     
     <div class="input-group">
-        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/...." onclick="this.select()">
+        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/...." onclick="this.select()" oninput="hafizayiSifirla()">
         
         <button class="paste-btn" id="btnPaste" onclick="yapistir()" title="Panodan Yapıştır">
             <svg viewBox="0 0 24 24">
@@ -111,36 +110,38 @@
 </div>
 
 <script>
-    // Global değişken: Son işlenen linki hafızada tutar
+    // Linkin son başarılı halini tutar
     var sonIslenenLink = "";
 
     function linkDonustur() {
         var inputElement = document.getElementById("driveLink");
-        var val = inputElement.value.trim(); // Boşlukları temizle
-        var btn = document.getElementById("btnConvert");
+        var val = inputElement.value.trim(); // Boşlukları temizleyerek al
 
         // 1. BOŞ KONTROLÜ
         if(val === "") { 
             hataAnimasyonu("Link Yazın!");
+            sonIslenenLink = ""; // Hata varsa hafızayı temizle ki tekrar deneyebilsin
             return; 
         } 
 
-        // 2. DEĞİŞİKLİK KONTROLÜ (Aynı linke tekrar basılmasın)
+        // 2. GEREKSİZ TIKLAMA ENGELİ (Eğer link değişmediyse ve zaten başarılıysa dur)
+        // Buradaki kritik nokta: Hata durumlarında sonIslenenLink'i sıfırladığımız için
+        // kullanıcı hatayı düzeltip bastığında buraya takılmayacak.
         if(val === sonIslenenLink) {
-            return; // Hiçbir şey yapma
+            return; 
         }
 
-        // 3. EKSİK HTTPS DÜZELTME (Manuel yazılanlar için de geçerli olsun)
-        // Eğer ID formatı uyuyor ama başında http yoksa ekle
+        // 3. EKSİK HTTPS DÜZELTME
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
             val = "https://" + val;
-            inputElement.value = val; // Kutuyu da güncelle
+            inputElement.value = val; // Kutuyu güncelle
         }
 
-        // 4. FORMAT KONTROLÜ
+        // 4. GEÇERSİZ FORMAT KONTROLÜ
         var idMatch = val.match(/\/d\/(.+?)\//);
         if (!idMatch) {
             hataAnimasyonu("Geçersiz Link!");
+            sonIslenenLink = ""; // Hata varsa hafızayı temizle
             return;
         }
 
@@ -150,26 +151,29 @@
 
         var finalDiv = document.getElementById("finalLink");
         finalDiv.innerText = newLink;
-        finalDiv.style.color = "#333"; // Yeni link üretilince rengi siyaha/griye döndür
+        finalDiv.style.color = "#333"; // Yeni link üretilince rengi sıfırla
 
         document.getElementById("previewImg").src = newLink;
         document.getElementById("resultArea").style.display = "block";
         
-        // Son işlenen linki güncelle
+        // Başarılı olduğu için bu linki hafızaya al
         sonIslenenLink = val;
 
         butonSifirla();
     }
 
+    // Kullanıcı elle yazı yazarsa hafıza sıfırlanmalı
+    function hafizayiSifirla() {
+        sonIslenenLink = "";
+    }
+
     function hataAnimasyonu(mesaj) {
         var btn = document.getElementById("btnConvert");
-        var orjinalMetin = "Dönüştür"; // Butonun orijinal metni sabit
+        var orjinalMetin = "Dönüştür";
 
-        // Animasyon ve renk sınıfını ekle
         btn.classList.add("error-shake");
         btn.innerText = mesaj;
 
-        // 1 Saniye sonra eski haline döndür
         setTimeout(function() {
             btn.classList.remove("error-shake");
             btn.innerText = orjinalMetin;
@@ -181,12 +185,11 @@
         var btn = document.getElementById("btnCopy");
 
         navigator.clipboard.writeText(finalDiv.innerText).then(function() {
-            // Buton İşlemleri
             btn.innerText = "Kopyalandı!";
             btn.style.backgroundColor = "#198754"; 
             btn.disabled = true; 
             
-            // LİNK METNİ RENK DEĞİŞİMİ (Kalıcı Yeşil)
+            // Link metni de yeşil olsun
             finalDiv.style.color = "#198754"; 
 
             setTimeout(function(){ butonSifirla(); }, 1000);
@@ -200,43 +203,35 @@
         btn.innerText = "Linki Kopyala";
         btn.style.backgroundColor = "#6c757d"; 
         btn.disabled = false; 
-        // Not: Link metninin rengini (#finalLink) burada sıfırlamıyoruz, 
-        // kullanıcı yeni link dönüştürene kadar yeşil kalsın istendi.
     }
 
     async function yapistir() {
         var inputAlani = document.getElementById("driveLink");
         var pasteBtn = document.getElementById("btnPaste");
 
-        // DİKKAT: inputAlani.focus() komutunu buradan kaldırdık.
-        // Böylece yapıştır'a basınca kutunun çerçevesi yanmayacak.
-
         try {
             const text = await navigator.clipboard.readText();
             var processedText = text.trim();
 
-            // Eksik HTTPS tamamlama
             if (processedText.match(/\/d\/(.+?)\//) && !processedText.startsWith("http")) {
                 processedText = "https://" + processedText;
             }
 
             inputAlani.value = processedText;
             
-            // Yeşil yanma süresi 1.5 saniye (1500ms) yapıldı
+            // Yapıştırma yapıldığı an hafızayı sıfırlıyoruz ki
+            // "aynı linki yapıştırdı" diye takılmasın, akış devam etsin.
+            sonIslenenLink = ""; 
+
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 1500);
 
-            // Format doğruysa otomatik dönüştür
-            // (Burada sonIslenenLink kontrolüne takılmasın diye manuel çağrı yapıyoruz,
-            // ama linkDonustur içindeki kontrolü aşmak için sonIslenenLink'i sıfırlamıyoruz,
-            // çünkü yeni bir link yapıştırıldıysa zaten farklıdır.)
             if (processedText.match(/\/d\/(.+?)\//)) {
                 linkDonustur();
             }
 
         } catch (err) {
             console.error("Hata:", err);
-            // Hata durumunda (izin yoksa) kutuyu temizle, kullanıcı elle girsin
             inputAlani.value = "";
         }
     }
