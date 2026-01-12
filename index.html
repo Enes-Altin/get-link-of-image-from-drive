@@ -29,7 +29,7 @@
             transition: border-color 0.3s; font-size: 14px;
         }
 
-        /* BUTON ANİMASYONLARI */
+        /* BUTON ANİMASYONLARI (Genel) */
         button:active { transform: scale(0.96); }
 
         /* Yapıştır Butonu */
@@ -52,12 +52,22 @@
         }
         .convert-btn:hover { background-color: #0b5ed7; }
         
-        /* PASİF (GRİ) BUTON STİLİ */
+        /* PASİF (Hata Durumu - Gri) */
         .convert-btn.passive {
             background-color: #adb5bd !important; 
             cursor: not-allowed; 
             transform: none !important; 
             pointer-events: none; 
+        }
+
+        /* SUCCESS LOCK (Başarılı Durum - Mavi ama Tepkisiz) 
+           Bu sınıf eklendiğinde buton mavi kalır ama active (küçülme) efekti çalışmaz.
+        */
+        .convert-btn.success-lock:active {
+            transform: none !important; /* Küçülme efektini iptal et */
+        }
+        .convert-btn.success-lock {
+            cursor: default; /* El işareti yerine normal ok çıksın ki basılmayacağı anlaşılsın */
         }
 
         /* HATA ANİMASYONU */
@@ -159,10 +169,7 @@
     var sonIslenenLink = "";
     var dinamikModAktif = false; 
 
-    // GÜVENLİK İÇİN YENİ SIKI REGEX (KURŞUN GEÇİRMEZ)
-    // 1. "drive.google.com" içermeli
-    // 2. "/d/" içermeli
-    // 3. ID kısmı en az 25 karakter olmalı ve sadece harf/rakam/_/- içermeli
+    // GÜVENLİ REGEX
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
     function changeLanguage() {
@@ -191,7 +198,12 @@
     }
 
     function dinamikKontrol() {
+        // Her harf girişinde hafızayı sil (YENİ)
         sonIslenenLink = ""; 
+
+        // Her harf girişinde, eğer başarı kilidi varsa (success-lock), onu kaldır.
+        // Böylece kullanıcı tekrar tıklayabilir hale gelir (animasyon geri döner).
+        document.getElementById("btnConvert").classList.remove("success-lock");
 
         if (!dinamikModAktif) return;
 
@@ -206,7 +218,6 @@
             return;
         }
 
-        // YENİ GÜVENLİ REGEX KULLANIMI
         var isValid = val.match(driveRegex);
         
         if (!isValid) {
@@ -220,6 +231,7 @@
 
     function linkDonustur() {
         var btn = document.getElementById("btnConvert");
+        // Pasifse çalışma
         if(btn.classList.contains('passive')) return;
 
         var inputElement = document.getElementById("driveLink");
@@ -231,17 +243,16 @@
             return; 
         } 
 
+        // Başarılı olup kilitlendiyse, tekrar basıldığında fonksiyonu durdur.
         if(val === sonIslenenLink) {
             return; 
         }
 
-        // HTTPS DÜZELTME
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
             val = "https://" + val;
             inputElement.value = val; 
         }
 
-        // GÜVENLİ REGEX KONTROLÜ
         var idMatch = val.match(driveRegex);
         if (!idMatch) {
             hataAnimasyonu(t.errInvalid);
@@ -259,7 +270,10 @@
         document.getElementById("resultArea").style.display = "block";
         
         sonIslenenLink = val; 
-        dinamikModAktif = false; // SIFIRLAMA BAŞARILI
+        dinamikModAktif = false; 
+
+        // BAŞARILI OLDUĞU İÇİN KİLİT SINIFINI EKLE
+        btn.classList.add("success-lock");
 
         butonSifirla();
     }
@@ -267,6 +281,9 @@
     function hataAnimasyonu(mesaj) {
         var btn = document.getElementById("btnConvert");
         
+        // Hata varsa başarı kilidini kaldır (gerçi zaten hata varsa kilit yoktur ama garanti olsun)
+        btn.classList.remove("success-lock");
+
         btn.classList.add("error-shake");
         btn.innerText = mesaj;
 
@@ -323,7 +340,6 @@
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 1500);
 
-            // Yapıştırırken de sıkı Regex ile kontrol et
             if (processedText.match(driveRegex)) {
                 linkDonustur();
             }
