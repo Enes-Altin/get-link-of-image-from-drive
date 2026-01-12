@@ -55,9 +55,9 @@
         /* PASİF (GRİ) BUTON STİLİ */
         .convert-btn.passive {
             background-color: #adb5bd !important; /* Gri */
-            cursor: not-allowed; /* Tıklanamaz imleci */
-            transform: none !important; /* Tıklama efekti yok */
-            pointer-events: none; /* Tıklamayı engelle */
+            cursor: not-allowed; 
+            transform: none !important; 
+            pointer-events: none; 
         }
 
         /* HATA ANİMASYONU */
@@ -70,7 +70,7 @@
         }
         .error-shake {
             animation: shake 0.3s ease-in-out;
-            background-color: #dc3545 !important; /* Kırmızı */
+            background-color: #dc3545 !important; 
         }
 
         /* SONUÇ ALANI */
@@ -79,7 +79,7 @@
         /* KOPYALA BUTONU (TURUNCU) */
         .copy-btn { 
             margin-top: 10px; 
-            background-color: #fd7e14; /* Turuncu */
+            background-color: #fd7e14; 
             color: white; border: none;
             padding: 8px 15px; border-radius: 4px; font-size: 13px; cursor: pointer;
             min-width: 140px; display: inline-block; text-align: center;
@@ -141,7 +141,6 @@
 </div>
 
 <script>
-    // --- ÇEVİRİLER ---
     const translations = {
         tr: {
             title: "Google Drive Resim Linki Dönüştürücü",
@@ -170,7 +169,7 @@
 
     let currentLang = 'tr';
     var sonIslenenLink = "";
-    var dinamikModAktif = false; // "İlk tıklamadan sonra" modu
+    var dinamikModAktif = false; // Sadece hata alındığında true olur
 
     function changeLanguage() {
         const select = document.getElementById('languageSelect');
@@ -189,23 +188,21 @@
             document.getElementById('btnCopy').innerText = t.btnCopy;
         }
 
-        // Eğer buton pasif moddaysa (hata gösteriyorsa), dili değiştirdiğimizde
-        // o anki hatayı da o dile çevirmemiz lazım.
         var btnConvert = document.getElementById('btnConvert');
         if (btnConvert.classList.contains('passive')) {
-            dinamikKontrol(); // Tekrar kontrol ettirip doğru dilde hatayı yazdır
+            dinamikKontrol(); // Pasifse hatayı o anki dilde güncelle
         } else if (!btnConvert.classList.contains('error-shake')) {
             btnConvert.innerText = t.btnConvert;
         }
     }
 
-    // --- DİNAMİK KONTROL MEKANİZMASI ---
-    // Bu fonksiyon her tuşa basıldığında çalışır ama sadece "dinamikModAktif" true ise butona müdahale eder.
+    // --- AKILLI KONTROL SİSTEMİ ---
     function dinamikKontrol() {
-        // Hafızayı her değişiklikte temizle ki kullanıcı düzeltip basabilsin
+        // Değişiklik olduğu an hafızayı sil
         sonIslenenLink = ""; 
 
-        // Eğer ilk tıklama henüz yapılmadıysa (site yeni açıldıysa) hiçbir şeye karışma.
+        // Eğer sistem "Cezalı" (Dinamik) modda değilse (yani site yeni açıldıysa veya son işlem başarılıysa)
+        // hiçbir kontrol yapma, buton Mavi kalsın.
         if (!dinamikModAktif) return;
 
         var inputElement = document.getElementById("driveLink");
@@ -213,41 +210,45 @@
         var btn = document.getElementById("btnConvert");
         const t = translations[currentLang];
 
-        // Boş Kontrolü
+        // 1. Boş Kontrolü
         if (val === "") {
-            btn.classList.add("passive"); // Pasif yap
-            btn.innerText = t.errEmpty;   // "Link Girilmedi!"
+            btn.classList.add("passive"); 
+            btn.innerText = t.errEmpty;   
             return;
         }
 
-        // Regex Kontrolü (Link formatı doğru mu?)
+        // 2. Format Kontrolü
         var isValid = val.match(/\/d\/(.+?)\//);
         
         if (!isValid) {
-            btn.classList.add("passive"); // Pasif yap
-            btn.innerText = t.errInvalid; // "Geçersiz Link!"
+            btn.classList.add("passive"); 
+            btn.innerText = t.errInvalid; 
         } else {
-            // DOĞRU FORMAT!
-            btn.classList.remove("passive"); // Aktif yap
-            btn.innerText = t.btnConvert;    // "Dönüştür"
+            // DOĞRU FORMAT: Butonu serbest bırak
+            btn.classList.remove("passive"); 
+            btn.innerText = t.btnConvert;    
         }
     }
 
     function linkDonustur() {
+        // Eğer dinamik modda buton pasifse işlem yapma (Ek güvenlik)
+        var btn = document.getElementById("btnConvert");
+        if(btn.classList.contains('passive')) return;
+
         var inputElement = document.getElementById("driveLink");
         var val = inputElement.value.trim();
         const t = translations[currentLang];
 
-        // 1. GEREKSİZ TIKLAMA ENGELİ (Başarılı sonuç varsa)
-        if(val === sonIslenenLink && sonIslenenLink !== "") {
-            return; 
-        }
-
-        // 2. BOŞ KONTROLÜ
+        // 1. BOŞ KONTROLÜ
         if(val === "") { 
             hataAnimasyonu(t.errEmpty);
             return; 
         } 
+
+        // 2. GEREKSİZ TIKLAMA ENGELİ
+        if(val === sonIslenenLink) {
+            return; 
+        }
 
         // 3. HTTPS DÜZELTME
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
@@ -273,36 +274,30 @@
         document.getElementById("previewImg").src = newLink;
         document.getElementById("resultArea").style.display = "block";
         
-        sonIslenenLink = val; // Başarıyı kaydet
+        // --- KRİTİK NOKTA: SIFIRLAMA ---
+        // İşlem başarılı oldu, artık "Saf Mod"a geri dönüyoruz.
+        // Kullanıcı buradan sonra silse de yanlış yazsa de buton Mavi kalacak
+        // ta ki basıp hata alana kadar.
+        sonIslenenLink = val; 
+        dinamikModAktif = false; // CEZAYI KALDIR
+
         butonSifirla();
-        
-        // Başarılı olursa dinamik modu kapatmıyoruz, buton aktif kalsın istendi.
-        // Ancak kullanıcı metni bozarsa dinamik modun devreye girmesi için
-        // dinamikModAktif true kalabilir mi? Hayır, başarılı olduysa
-        // hata alana kadar normal davranmalı.
-        // İsteğe göre: "tuş pasif hale geldi o zaman dinamik olsun".
-        // Şu an buton aktif olduğu için sorun yok.
     }
 
     function hataAnimasyonu(mesaj) {
         var btn = document.getElementById("btnConvert");
         
-        // Animasyonu başlat
         btn.classList.add("error-shake");
         btn.innerText = mesaj;
 
-        // ARTIK DİNAMİK MODU AÇIYORUZ
+        // HATA ALDIĞI İÇİN CEZA SİSTEMİNİ (Dinamik Mod) BAŞLAT
         dinamikModAktif = true;
 
         setTimeout(function() {
             btn.classList.remove("error-shake");
             
-            // Animasyon bitince butonu PASİF yap (Gri ve Tıklanamaz)
+            // Animasyon bitti, şimdi butonu kilitle
             btn.classList.add("passive");
-            // Metin o anki hata mesajı olarak kalır (zaten yukarıda set ettik)
-            
-            // Buradan sonra kullanıcının inputa girdiği her harf "dinamikKontrol" 
-            // tarafından denetlenecek ve geçerliyse buton açılacak.
         }, 1000);
     }
 
@@ -313,7 +308,7 @@
 
         navigator.clipboard.writeText(finalDiv.innerText).then(function() {
             btn.innerText = t.msgCopied;
-            btn.style.backgroundColor = "#198754"; // Yeşil
+            btn.style.backgroundColor = "#198754"; 
             btn.disabled = true; 
             
             finalDiv.style.color = "#198754"; 
@@ -329,7 +324,7 @@
         const t = translations[currentLang];
         
         btn.innerText = t.btnCopy;
-        btn.style.backgroundColor = "#fd7e14"; // Turuncuya dön
+        btn.style.backgroundColor = "#fd7e14"; 
         btn.disabled = false; 
     }
 
@@ -349,7 +344,7 @@
 
             inputAlani.value = processedText;
             
-            // Yapıştırma da bir "değişikliktir", kontrolü tetikle
+            // Yapıştırma sonrası kontrol
             dinamikKontrol();
 
             pasteBtn.style.backgroundColor = "#198754"; 
