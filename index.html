@@ -10,12 +10,53 @@
         .container { position: relative; max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .label { font-weight: bold; margin-top: 15px; display: block; margin-bottom: 5px; color: #333; }
 
-        /* DİL SEÇİCİ */
-        .lang-select {
-            position: absolute; top: 20px; right: 20px; padding: 5px;
-            border-radius: 4px; border: 1px solid #ddd; background: #fff;
-            font-size: 12px; cursor: pointer; outline: none;
+        /* --- ÖZEL DİL MENÜSÜ --- */
+        .lang-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 50;
         }
+
+        .lang-btn {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background 0.2s;
+        }
+        .lang-btn:hover { background: #f8f9fa; }
+
+        .lang-list {
+            display: none; /* Başlangıçta gizli */
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            list-style: none;
+            padding: 0;
+            width: 150px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .lang-list li {
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .lang-list li:last-child { border-bottom: none; }
+        .lang-list li:hover { background-color: #f0f0f0; }
 
         /* INPUT GROUP */
         .input-group { display: flex; align-items: center; margin: 10px 0; }
@@ -29,8 +70,7 @@
             transition: border-color 0.3s; font-size: 14px;
         }
 
-        /* BUTON ANİMASYONLARI (GENEL) */
-        /* scale(0.96) ile hafifçe küçülür, süreyi 0.2s yaptık (daha yumuşak) */
+        /* BUTON ANİMASYONLARI */
         button:active { transform: scale(0.96); }
 
         /* Yapıştır Butonu */
@@ -49,11 +89,10 @@
             background-color: #0d6efd; color: white; padding: 12px 20px; 
             border: none; border-radius: 4px; cursor: pointer; width: 100%; 
             font-size: 15px; margin-bottom: 5px; font-weight: bold;
-            transition: background-color 0.3s, transform 0.2s; /* Süre uzatıldı */
+            transition: background-color 0.3s, transform 0.2s;
         }
         .convert-btn:hover { background-color: #0b5ed7; }
         
-        /* PASİF (Hata Durumu - Gri) */
         .convert-btn.passive {
             background-color: #adb5bd !important; 
             cursor: not-allowed; 
@@ -61,11 +100,9 @@
             pointer-events: none; 
         }
 
-        /* SUCCESS LOCK (Başarılı Durum - Mavi ama Tepkisiz) */
         .convert-btn.success-lock:active { transform: none !important; }
         .convert-btn.success-lock { cursor: default; }
 
-        /* HATA ANİMASYONU */
         @keyframes shake {
             0% { transform: translateX(0); } 25% { transform: translateX(-5px); }
             50% { transform: translateX(5px); } 75% { transform: translateX(-5px); }
@@ -73,7 +110,6 @@
         }
         .error-shake { animation: shake 0.3s ease-in-out; background-color: #dc3545 !important; }
 
-        /* SONUÇ ALANI */
         .result-box { margin-top: 25px; padding: 15px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; word-break: break-all; display: none; }
 
         /* KOPYALA BUTONU (SAĞA YASLI) */
@@ -83,28 +119,17 @@
             color: white; border: none;
             padding: 8px 15px; border-radius: 4px; font-size: 13px; cursor: pointer;
             min-width: 140px; 
-            
-            /* Sağa yaslama */
-            display: block;      
-            margin-left: auto;   
-            margin-right: 0;     
-            
+            display: block; margin-left: auto; margin-right: 0;     
             text-align: center;
-            /* transform süresini 0.2s yaptık ki tıklama daha yumuşak olsun */
             transition: background-color 0.3s, transform 0.2s; 
-            outline: none; /* Tıklayınca oluşan mavi çerçeveyi kaldırır */
+            outline: none;
         }
         .copy-btn:hover { background-color: #e36906; } 
         
-        /* YENİ GÖZ KIRPMA ANİMASYONU (Daha Yumuşak) */
         @keyframes blinkText {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; } /* Tamamen kaybolmasın, silikleşsin */
-            100% { opacity: 1; }
+            0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; }
         }
-        .text-blink {
-            animation: blinkText 0.3s ease-in-out; /* Süre biraz uzatıldı */
-        }
+        .text-blink { animation: blinkText 0.3s ease-in-out; }
 
         #finalLink { 
             user-select: auto; cursor: default; 
@@ -112,24 +137,81 @@
             border-radius: 4px; font-size: 13px; color: #333; 
             transition: color 0.3s; 
         }
+
+        /* --- ÖNİZLEME & LIGHTBOX --- */
+        #previewImg {
+            max-width: 100%; 
+            height: auto; 
+            max-height: 120px; /* Küçük Önizleme */
+            border-radius: 4px; 
+            margin-top: 5px;
+            cursor: zoom-in; /* Büyüteç imleci */
+            transition: opacity 0.2s;
+            display: block;
+        }
+        #previewImg:hover { opacity: 0.9; }
+
+        /* Modal (Lightbox) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; top: 0; 
+            width: 100%; height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.85); /* Koyu Arka Plan */
+            backdrop-filter: blur(2px);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1001;
+        }
     </style>
 </head>
 <body>
 
+<div id="imgModal" class="modal" onclick="closeModal()">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="fullImage">
+</div>
+
 <div class="container">
-    <select id="languageSelect" class="lang-select" onchange="changeLanguage()">
-        <option value="tr" selected>Türkçe</option>
-        <option value="en">English</option>
-        <option value="zh">中文 (Chinese)</option>
-        <option value="es">Español</option>
-        <option value="hi">हिन्दी (Hindi)</option>
-        <option value="ar">العربية (Arabic)</option>
-        <option value="pt">Português</option>
-        <option value="ru">Русский</option>
-        <option value="ja">日本語 (Japanese)</option>
-        <option value="de">Deutsch</option>
-        <option value="fr">Français</option>
-    </select>
+    <div class="lang-wrapper">
+        <button class="lang-btn" onclick="toggleLangMenu(event)">
+            <span style="font-size: 16px;">🌐</span> 
+            <span id="currentLangLabel">TR</span>
+        </button>
+        <ul class="lang-list" id="langList">
+            <li onclick="selectLang('tr')">Türkçe</li>
+            <li onclick="selectLang('en')">English</li>
+            <li onclick="selectLang('zh')">中文 (Chinese)</li>
+            <li onclick="selectLang('es')">Español</li>
+            <li onclick="selectLang('hi')">हिन्दी (Hindi)</li>
+            <li onclick="selectLang('ar')">العربية (Arabic)</li>
+            <li onclick="selectLang('pt')">Português</li>
+            <li onclick="selectLang('ru')">Русский</li>
+            <li onclick="selectLang('ja')">日本語 (Japanese)</li>
+            <li onclick="selectLang('de')">Deutsch</li>
+            <li onclick="selectLang('fr')">Français</li>
+        </ul>
+    </div>
 
     <h3 style="margin-top:0; padding-right: 80px;" data-lang="title">Google Drive Resim Linki Dönüştürücü</h3>
     
@@ -154,11 +236,12 @@
         
         <br><br>
         <label class="label" data-lang="labelPreview">Önizleme:</label>
-        <img id="previewImg" src="" alt="Preview" style="max-width: 100%; height: auto; border-radius: 4px; margin-top:5px;">
+        <img id="previewImg" src="" alt="Preview" onclick="openModal(this.src)">
     </div>
 </div>
 
 <script>
+    // --- ÇEVİRİLER ---
     const translations = {
         tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "https://drive.google.com/file/d/....", btnConvert: "Dönüştür", labelResult: "Direkt Resim Linkin:", btnCopy: "Linki Kopyala", labelPreview: "Önizleme:", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", pasteTooltip: "Panodan Yapıştır" },
         en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste your link here...", btnConvert: "Convert", labelResult: "Your Direct Link:", btnCopy: "Copy Link", labelPreview: "Preview:", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", pasteTooltip: "Paste from Clipboard" },
@@ -176,15 +259,62 @@
     let currentLang = 'tr';
     var sonIslenenLink = "";
     var dinamikModAktif = false; 
-
-    // GÜVENLİ REGEX
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
-    function changeLanguage() {
-        const select = document.getElementById('languageSelect');
-        currentLang = select.value;
-        const t = translations[currentLang];
+    // --- DİL MENÜSÜ FONKSİYONLARI ---
+    
+    // Global tıklama sayacı (Menü dışına kaç kere tıklandı?)
+    var disTiklamaSayisi = 0;
 
+    function toggleLangMenu(event) {
+        event.stopPropagation(); // Tıklamanın document'e gitmesini engelle
+        var list = document.getElementById("langList");
+        
+        if (list.style.display === "block") {
+            list.style.display = "none";
+            disTiklamaSayisi = 0; // Kapatınca sayacı sıfırla
+        } else {
+            list.style.display = "block";
+            disTiklamaSayisi = 0; // Açınca sayacı sıfırla
+        }
+    }
+
+    // Bir dil seçildiğinde
+    function selectLang(code) {
+        currentLang = code;
+        document.getElementById("currentLangLabel").innerText = code.toUpperCase();
+        
+        // Menüyü kapat
+        document.getElementById("langList").style.display = "none";
+        disTiklamaSayisi = 0;
+
+        // Çevirileri uygula
+        applyTranslations();
+    }
+
+    // Belgeye tıklama dinleyicisi (3 Tıklama Kuralı)
+    document.addEventListener('click', function(event) {
+        var list = document.getElementById("langList");
+        var btn = document.querySelector(".lang-btn");
+
+        // Eğer menü açıksa
+        if (list.style.display === "block") {
+            // Tıklanan yer menü veya buton DEĞİLSE
+            if (!list.contains(event.target) && !btn.contains(event.target)) {
+                disTiklamaSayisi++;
+                
+                // 3. tıklayışta gizle
+                if (disTiklamaSayisi >= 3) {
+                    list.style.display = "none";
+                    disTiklamaSayisi = 0;
+                }
+            }
+        }
+    });
+
+    function applyTranslations() {
+        const t = translations[currentLang];
+        
         document.querySelectorAll('[data-lang]').forEach(el => {
             const key = el.getAttribute('data-lang');
             if (t[key]) el.innerText = t[key];
@@ -192,7 +322,7 @@
 
         document.getElementById('driveLink').placeholder = t.placeholder;
         document.getElementById('btnPaste').title = t.pasteTooltip;
-        
+
         var btnCopy = document.getElementById('btnCopy');
         if(btnCopy.style.backgroundColor !== "rgb(25, 135, 84)" && btnCopy.style.backgroundColor !== "#198754") {
              btnCopy.innerText = t.btnCopy;
@@ -208,6 +338,21 @@
         }
     }
 
+    // --- LIGHTBOX İŞLEMLERİ ---
+    function openModal(src) {
+        var modal = document.getElementById("imgModal");
+        var modalImg = document.getElementById("fullImage");
+        if(src) {
+            modal.style.display = "block";
+            modalImg.src = src;
+        }
+    }
+
+    function closeModal() {
+        document.getElementById("imgModal").style.display = "none";
+    }
+
+    // --- DİĞER FONKSİYONLAR (AYNEN KORUNDU) ---
     function dinamikKontrol() {
         sonIslenenLink = ""; 
         document.getElementById("btnConvert").classList.remove("success-lock");
@@ -226,7 +371,6 @@
         }
 
         var isValid = val.match(driveRegex);
-        
         if (!isValid) {
             btn.classList.add("passive"); 
             btn.innerText = t.errInvalid; 
@@ -248,11 +392,9 @@
             hataAnimasyonu(t.errEmpty);
             return; 
         } 
-
         if(val === sonIslenenLink) {
             return; 
         }
-
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
             val = "https://" + val;
             inputElement.value = val; 
@@ -271,14 +413,16 @@
         finalDiv.innerText = newLink;
         finalDiv.style.color = "#333"; 
 
-        document.getElementById("previewImg").src = newLink;
+        // Önizleme ve Modal Src Ayarla
+        var img = document.getElementById("previewImg");
+        img.src = newLink;
+        
         document.getElementById("resultArea").style.display = "block";
         
         sonIslenenLink = val; 
         dinamikModAktif = false; 
 
         btn.classList.add("success-lock");
-
         butonSifirla();
     }
 
@@ -287,9 +431,7 @@
         btn.classList.remove("success-lock");
         btn.classList.add("error-shake");
         btn.innerText = mesaj;
-
         dinamikModAktif = true;
-
         setTimeout(function() {
             btn.classList.remove("error-shake");
             btn.classList.add("passive");
@@ -307,7 +449,6 @@
             
             finalDiv.style.color = "#198754"; 
 
-            // GÖZ KIRPMA EFEKTİ (Daha yumuşak hali)
             btn.classList.remove("text-blink");
             void btn.offsetWidth; 
             btn.classList.add("text-blink");
@@ -320,7 +461,6 @@
     function butonSifirla() {
         var btn = document.getElementById("btnCopy");
         const t = translations[currentLang];
-        
         btn.innerText = t.btnCopy;
         btn.style.backgroundColor = "#fd7e14"; 
         btn.classList.remove("text-blink");
