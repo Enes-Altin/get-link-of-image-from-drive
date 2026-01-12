@@ -10,18 +10,11 @@
         .container { position: relative; max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .label { font-weight: bold; margin-top: 15px; display: block; margin-bottom: 5px; color: #333; }
 
-        /* DİL SEÇİCİ (Sağ Üst) */
+        /* DİL SEÇİCİ */
         .lang-select {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            padding: 5px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            background: #fff;
-            font-size: 12px;
-            cursor: pointer;
-            outline: none;
+            position: absolute; top: 20px; right: 20px; padding: 5px;
+            border-radius: 4px; border: 1px solid #ddd; background: #fff;
+            font-size: 12px; cursor: pointer; outline: none;
         }
 
         /* INPUT GROUP */
@@ -33,8 +26,7 @@
             border-top-left-radius: 4px; border-bottom-left-radius: 4px; 
             border-top-right-radius: 0; border-bottom-right-radius: 0; 
             border-right: none; height: 45px; box-sizing: border-box;
-            transition: border-color 0.3s;
-            font-size: 14px;
+            transition: border-color 0.3s; font-size: 14px;
         }
 
         /* BUTON ANİMASYONLARI */
@@ -56,9 +48,16 @@
             background-color: #0d6efd; color: white; padding: 12px 20px; 
             border: none; border-radius: 4px; cursor: pointer; width: 100%; 
             font-size: 15px; margin-bottom: 5px; font-weight: bold;
-            transition: background-color 0.2s, transform 0.1s;
+            transition: background-color 0.3s, transform 0.1s;
         }
         .convert-btn:hover { background-color: #0b5ed7; }
+        
+        /* PASİF (GRİ) BUTON STİLİ */
+        .convert-btn.passive {
+            background-color: #adb5bd !important; /* Gri */
+            cursor: default;
+            transform: none !important; /* Tıklama efekti yok */
+        }
 
         /* HATA ANİMASYONU */
         @keyframes shake {
@@ -70,20 +69,22 @@
         }
         .error-shake {
             animation: shake 0.3s ease-in-out;
-            background-color: #dc3545 !important; 
+            background-color: #dc3545 !important; /* Kırmızı */
         }
 
         /* SONUÇ ALANI */
         .result-box { margin-top: 25px; padding: 15px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; word-break: break-all; display: none; }
 
-        /* KOPYALA BUTONU */
+        /* KOPYALA BUTONU (TURUNCU) */
         .copy-btn { 
-            margin-top: 10px; background-color: #6c757d; color: white; border: none;
+            margin-top: 10px; 
+            background-color: #fd7e14; /* Turuncu */
+            color: white; border: none;
             padding: 8px 15px; border-radius: 4px; font-size: 13px; cursor: pointer;
             min-width: 140px; display: inline-block; text-align: center;
             transition: background-color 0.3s, transform 0.1s;
         }
-        .copy-btn:hover { background-color: #5c636a; }
+        .copy-btn:hover { background-color: #e36906; } /* Koyu Turuncu hover */
         .copy-btn:disabled { cursor: default; opacity: 1; transform: none; }
 
         #finalLink { 
@@ -116,7 +117,7 @@
     <label class="label" data-lang="labelInput">Normal Drive Linki:</label>
     
     <div class="input-group">
-        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/...." onclick="this.select()" oninput="hafizayiSifirla()">
+        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/...." onclick="this.select()" oninput="inputDegisti()">
         
         <button class="paste-btn" id="btnPaste" onclick="yapistir()" title="Panodan Yapıştır">
             <svg viewBox="0 0 24 24">
@@ -149,7 +150,7 @@
             labelResult: "Direkt Resim Linkin:",
             btnCopy: "Linki Kopyala",
             labelPreview: "Önizleme:",
-            errEmpty: "Link Girilmedi",
+            errEmpty: "Link Girilmedi!", // Ünlem eklendi
             errInvalid: "Geçersiz Link!",
             msgCopied: "Kopyalandı!",
             pasteTooltip: "Panodan Yapıştır"
@@ -162,173 +163,84 @@
             labelResult: "Your Direct Link:",
             btnCopy: "Copy Link",
             labelPreview: "Preview:",
-            errEmpty: "No Link Entered",
+            errEmpty: "No Link Entered!",
             errInvalid: "Invalid Link!",
             msgCopied: "Copied!",
             pasteTooltip: "Paste from Clipboard"
         },
-        zh: {
-            title: "Google Drive 直接链接生成器",
-            labelInput: "原始 Drive 链接：",
-            placeholder: "在此处粘贴链接...",
-            btnConvert: "转换",
-            labelResult: "您的直接链接：",
-            btnCopy: "复制链接",
-            labelPreview: "预览：",
-            errEmpty: "未输入链接",
-            errInvalid: "无效链接！",
-            msgCopied: "已复制！",
-            pasteTooltip: "从剪贴板粘贴"
-        },
-        es: {
-            title: "Generador de Enlaces Directos Drive",
-            labelInput: "Enlace Original:",
-            placeholder: "Pega tu enlace aquí...",
-            btnConvert: "Convertir",
-            labelResult: "Tu Enlace Directo:",
-            btnCopy: "Copiar Enlace",
-            labelPreview: "Vista Previa:",
-            errEmpty: "No se ingresó enlace",
-            errInvalid: "¡Enlace Inválido!",
-            msgCopied: "¡Copiado!",
-            pasteTooltip: "Pegar desde portapapeles"
-        },
-        hi: {
-            title: "Google Drive डायरेक्ट लिंक जेनरेटर",
-            labelInput: "मूल ड्राइव लिंक:",
-            placeholder: "अपना लिंक यहाँ चिपकाएँ...",
-            btnConvert: "बदलें",
-            labelResult: "आपका डायरेक्ट लिंक:",
-            btnCopy: "लिंक कॉपी करें",
-            labelPreview: "पूर्वावलोकन:",
-            errEmpty: "कोई लिंक दर्ज नहीं किया गया",
-            errInvalid: "अमान्य लिंक!",
-            msgCopied: "कॉपी हो गया!",
-            pasteTooltip: "क्लिपबोर्ड से चिपकाएं"
-        },
-        ar: {
-            title: "محول روابط جوجل درايف",
-            labelInput: "رابط درايف الأصلي:",
-            placeholder: "الصق الرابط هنا...",
-            btnConvert: "تحويل",
-            labelResult: "الرابط المباشر:",
-            btnCopy: "نسخ الرابط",
-            labelPreview: "معاينة:",
-            errEmpty: "لم يتم إدخال رابط",
-            errInvalid: "رابط غير صالح!",
-            msgCopied: "تم النسخ!",
-            pasteTooltip: "لصق من الحافظة"
-        },
-        pt: {
-            title: "Gerador de Links Diretos Drive",
-            labelInput: "Link Original:",
-            placeholder: "Cole seu link aqui...",
-            btnConvert: "Converter",
-            labelResult: "Seu Link Direto:",
-            btnCopy: "Copiar Link",
-            labelPreview: "Pré-visualização:",
-            errEmpty: "Nenhum link inserido",
-            errInvalid: "Link Inválido!",
-            msgCopied: "Copiado!",
-            pasteTooltip: "Colar da área de transferência"
-        },
-        ru: {
-            title: "Генератор прямых ссылок Drive",
-            labelInput: "Исходная ссылка:",
-            placeholder: "Вставьте ссылку сюда...",
-            btnConvert: "Конвертировать",
-            labelResult: "Прямая ссылка:",
-            btnCopy: "Копировать",
-            labelPreview: "Предпросмотр:",
-            errEmpty: "Ссылка не введена",
-            errInvalid: "Неверная ссылка!",
-            msgCopied: "Скопировано!",
-            pasteTooltip: "Вставить из буфера"
-        },
-        ja: {
-            title: "Google Drive 直リンク作成ツール",
-            labelInput: "元のリンク:",
-            placeholder: "ここにリンクを貼り付け...",
-            btnConvert: "変換",
-            labelResult: "直リンク:",
-            btnCopy: "リンクをコピー",
-            labelPreview: "プレビュー:",
-            errEmpty: "リンクがありません",
-            errInvalid: "無効なリンクです!",
-            msgCopied: "コピーしました!",
-            pasteTooltip: "クリップボードから貼り付け"
-        },
-        de: {
-            title: "Google Drive Direktlink-Generator",
-            labelInput: "Original-Link:",
-            placeholder: "Link hier einfügen...",
-            btnConvert: "Umwandeln",
-            labelResult: "Ihr Direktlink:",
-            btnCopy: "Link kopieren",
-            labelPreview: "Vorschau:",
-            errEmpty: "Kein Link eingegeben",
-            errInvalid: "Ungültiger Link!",
-            msgCopied: "Kopiert!",
-            pasteTooltip: "Aus Zwischenablage einfügen"
-        },
-        fr: {
-            title: "Générateur de liens directs Drive",
-            labelInput: "Lien Original:",
-            placeholder: "Collez votre lien ici...",
-            btnConvert: "Convertir",
-            labelResult: "Votre lien direct:",
-            btnCopy: "Copier le lien",
-            labelPreview: "Aperçu:",
-            errEmpty: "Aucun lien saisi",
-            errInvalid: "Lien invalide !",
-            msgCopied: "Copié !",
-            pasteTooltip: "Coller depuis le presse-papiers"
-        }
+        // ... (Diğer diller aynı kalıyor, sadece errEmpty güncellendi varsayalım) ...
+        zh: { title: "Google Drive 直接链接生成器", labelInput: "原始 Drive 链接：", placeholder: "在此处粘贴链接...", btnConvert: "转换", labelResult: "您的直接链接：", btnCopy: "复制链接", labelPreview: "预览：", errEmpty: "未输入链接！", errInvalid: "无效链接！", msgCopied: "已复制！", pasteTooltip: "从剪贴板粘贴" },
+        es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega tu enlace aquí...", btnConvert: "Convertir", labelResult: "Tu Enlace Directo:", btnCopy: "Copiar Enlace", labelPreview: "Vista Previa:", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", pasteTooltip: "Pegar desde portapapeles" },
+        hi: { title: "Google Drive डायरेक्ट लिंक जेनरेटर", labelInput: "मूल ड्राइव लिंक:", placeholder: "अपना लिंक यहाँ चिपकाएँ...", btnConvert: "बदलें", labelResult: "आपका डायरेक्ट लिंक:", btnCopy: "लिंक कॉपी करें", labelPreview: "पूर्वावलोकन:", errEmpty: "लिंक दर्ज नहीं किया गया!", errInvalid: "अमान्य लिंक!", msgCopied: "कॉपी हो गया!", pasteTooltip: "क्लिपबोर्ड से चिपकाएं" },
+        ar: { title: "محول روابط جوجل درايف", labelInput: "رابط درايف الأصلي:", placeholder: "الصق الرابط هنا...", btnConvert: "تحويل", labelResult: "الرابط المباشر:", btnCopy: "نسخ الرابط", labelPreview: "معاينة:", errEmpty: "لم يتم إدخال رابط!", errInvalid: "رابط غير صالح!", msgCopied: "تم النسخ!", pasteTooltip: "لصق من الحافظة" },
+        pt: { title: "Gerador de Links Diretos Drive", labelInput: "Link Original:", placeholder: "Cole seu link aqui...", btnConvert: "Converter", labelResult: "Seu Link Direto:", btnCopy: "Copiar Link", labelPreview: "Pré-visualização:", errEmpty: "Nenhum link inserido!", errInvalid: "Link Inválido!", msgCopied: "Copiado!", pasteTooltip: "Colar da área de transferência" },
+        ru: { title: "Генератор прямых ссылок Drive", labelInput: "Исходная ссылка:", placeholder: "Вставьте ссылку сюда...", btnConvert: "Конвертировать", labelResult: "Прямая ссылка:", btnCopy: "Копировать", labelPreview: "Предпросмотр:", errEmpty: "Ссылка не введена!", errInvalid: "Неверная ссылка!", msgCopied: "Скопировано!", pasteTooltip: "Вставить из буфера" },
+        ja: { title: "Google Drive 直リンク作成ツール", labelInput: "元のリンク:", placeholder: "ここにリンクを貼り付け...", btnConvert: "変換", labelResult: "直リンク:", btnCopy: "リンクをコピー", labelPreview: "プレビュー:", errEmpty: "リンク未入力！", errInvalid: "無効なリンクです!", msgCopied: "コピーしました!", pasteTooltip: "クリップボードから貼り付け" },
+        de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Link hier einfügen...", btnConvert: "Umwandeln", labelResult: "Ihr Direktlink:", btnCopy: "Link kopieren", labelPreview: "Vorschau:", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", pasteTooltip: "Aus Zwischenablage einfügen" },
+        fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez votre lien ici...", btnConvert: "Convertir", labelResult: "Votre lien direct:", btnCopy: "Copier le lien", labelPreview: "Aperçu:", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", pasteTooltip: "Coller depuis le presse-papiers" }
     };
 
-    let currentLang = 'tr'; // Varsayılan dil
+    let currentLang = 'tr';
     var sonIslenenLink = "";
+    var hataModu = false; // Hata durumunda butonu kilitlemek için
 
-    // DİL DEĞİŞTİRME FONKSİYONU
     function changeLanguage() {
         const select = document.getElementById('languageSelect');
         currentLang = select.value;
         const t = translations[currentLang];
 
-        // Sabit metinleri güncelle
         document.querySelectorAll('[data-lang]').forEach(el => {
             const key = el.getAttribute('data-lang');
             if (t[key]) el.innerText = t[key];
         });
 
-        // Input placeholder ve tooltip güncelle
         document.getElementById('driveLink').placeholder = t.placeholder;
         document.getElementById('btnPaste').title = t.pasteTooltip;
         
-        // Buton resetleme durumunda doğru dilde metin gelsin
+        // Buton metinlerini güncelle (Eğer özel durum yoksa)
         if(!document.getElementById('btnCopy').disabled) {
             document.getElementById('btnCopy').innerText = t.btnCopy;
         }
-        if(!document.getElementById('btnConvert').classList.contains('error-shake')) {
-            document.getElementById('btnConvert').innerText = t.btnConvert;
+        // Eğer hata modu aktif değilse veya sallanma animasyonu yoksa güncelle
+        var btnConvert = document.getElementById('btnConvert');
+        if(!btnConvert.classList.contains('error-shake') && !hataModu) {
+            btnConvert.innerText = t.btnConvert;
         }
     }
 
+    // Input değiştiğinde butonu tekrar aktifleştir
+    function inputDegisti() {
+        var btn = document.getElementById('btnConvert');
+        
+        // Hata modundaysa veya pasifse, normale döndür
+        if (hataModu || btn.classList.contains('passive')) {
+            const t = translations[currentLang];
+            btn.classList.remove('passive');
+            btn.innerText = t.btnConvert;
+            hataModu = false;
+        }
+        
+        // Hafızayı sıfırla ki yeni linki işleyebilelim
+        sonIslenenLink = "";
+    }
+
     function linkDonustur() {
+        // Eğer buton pasifse hiçbir şey yapma
+        if(hataModu) return;
+
         var inputElement = document.getElementById("driveLink");
         var val = inputElement.value.trim();
         const t = translations[currentLang];
 
-        // 1. BOŞ KONTROLÜ (Dinamik dil ile)
+        // 1. BOŞ KONTROLÜ
         if(val === "") { 
             hataAnimasyonu(t.errEmpty);
-            sonIslenenLink = ""; 
             return; 
         } 
 
-        // 2. GEREKSİZ TIKLAMA ENGELİ
+        // 2. GEREKSİZ TIKLAMA ENGELİ (Başarılı sonuç varsa)
         if(val === sonIslenenLink) {
-            return; 
+            return; // Tepki verme
         }
 
         // 3. HTTPS DÜZELTME
@@ -341,11 +253,10 @@
         var idMatch = val.match(/\/d\/(.+?)\//);
         if (!idMatch) {
             hataAnimasyonu(t.errInvalid);
-            sonIslenenLink = ""; 
             return;
         }
 
-        // --- İŞLEM ---
+        // --- İŞLEM BAŞARILI ---
         var fileID = idMatch[1];
         var newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
 
@@ -356,24 +267,25 @@
         document.getElementById("previewImg").src = newLink;
         document.getElementById("resultArea").style.display = "block";
         
-        sonIslenenLink = val;
-        butonSifirla();
-    }
-
-    function hafizayiSifirla() {
-        sonIslenenLink = "";
+        sonIslenenLink = val; // Başarıyı kaydet
+        butonSifirla(); // Kopyala butonunu sıfırla
     }
 
     function hataAnimasyonu(mesaj) {
         var btn = document.getElementById("btnConvert");
-        var t = translations[currentLang];
         
+        // Animasyon başlat
         btn.classList.add("error-shake");
         btn.innerText = mesaj;
+        
+        // Hata modunu aç (Buton tıklanamaz hale gelir)
+        hataModu = true;
 
+        // 1 Saniye sonra animasyon biter ama buton GRİ (Pasif) kalır
         setTimeout(function() {
             btn.classList.remove("error-shake");
-            btn.innerText = t.btnConvert; // O anki dilde eski haline dön
+            btn.classList.add("passive"); // Butonu gri yap
+            // Metin "Link Girilmedi!" olarak kalır, kullanıcı yazana kadar
         }, 1000);
     }
 
@@ -384,7 +296,7 @@
 
         navigator.clipboard.writeText(finalDiv.innerText).then(function() {
             btn.innerText = t.msgCopied;
-            btn.style.backgroundColor = "#198754"; 
+            btn.style.backgroundColor = "#198754"; // Yeşil
             btn.disabled = true; 
             
             finalDiv.style.color = "#198754"; 
@@ -400,7 +312,7 @@
         const t = translations[currentLang];
         
         btn.innerText = t.btnCopy;
-        btn.style.backgroundColor = "#6c757d"; 
+        btn.style.backgroundColor = "#fd7e14"; // Turuncuya dön
         btn.disabled = false; 
     }
 
@@ -416,13 +328,12 @@
                 processedText = "https://" + processedText;
             }
 
-            // AYNI METİN KONTROLÜ
-            if (inputAlani.value === processedText) {
-                return; 
-            }
+            if (inputAlani.value === processedText) return; 
 
             inputAlani.value = processedText;
-            sonIslenenLink = ""; 
+            
+            // Yapıştırma yapıldığı an "inputDegisti" mantığını manuel çalıştır
+            inputDegisti();
 
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 1500);
@@ -434,6 +345,7 @@
         } catch (err) {
             console.error("Hata:", err);
             inputAlani.value = "";
+            inputDegisti(); // Temizlenince de resetle
         }
     }
 </script>
