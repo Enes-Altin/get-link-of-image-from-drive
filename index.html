@@ -54,7 +54,7 @@
         
         /* PASİF (GRİ) BUTON STİLİ */
         .convert-btn.passive {
-            background-color: #adb5bd !important; /* Gri */
+            background-color: #adb5bd !important; 
             cursor: not-allowed; 
             transform: none !important; 
             pointer-events: none; 
@@ -76,7 +76,7 @@
         /* SONUÇ ALANI */
         .result-box { margin-top: 25px; padding: 15px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; word-break: break-all; display: none; }
 
-        /* KOPYALA BUTONU (TURUNCU) */
+        /* KOPYALA BUTONU */
         .copy-btn { 
             margin-top: 10px; 
             background-color: #fd7e14; 
@@ -142,19 +142,7 @@
 
 <script>
     const translations = {
-        tr: {
-            title: "Google Drive Resim Linki Dönüştürücü",
-            labelInput: "Normal Drive Linki:",
-            placeholder: "https://drive.google.com/file/d/....",
-            btnConvert: "Dönüştür",
-            labelResult: "Direkt Resim Linkin:",
-            btnCopy: "Linki Kopyala",
-            labelPreview: "Önizleme:",
-            errEmpty: "Link Girilmedi!",
-            errInvalid: "Geçersiz Link!",
-            msgCopied: "Kopyalandı!",
-            pasteTooltip: "Panodan Yapıştır"
-        },
+        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "https://drive.google.com/file/d/....", btnConvert: "Dönüştür", labelResult: "Direkt Resim Linkin:", btnCopy: "Linki Kopyala", labelPreview: "Önizleme:", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", pasteTooltip: "Panodan Yapıştır" },
         en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste your link here...", btnConvert: "Convert", labelResult: "Your Direct Link:", btnCopy: "Copy Link", labelPreview: "Preview:", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", pasteTooltip: "Paste from Clipboard" },
         zh: { title: "Google Drive 直接链接生成器", labelInput: "原始 Drive 链接：", placeholder: "在此处粘贴链接...", btnConvert: "转换", labelResult: "您的直接链接：", btnCopy: "复制链接", labelPreview: "预览：", errEmpty: "未输入链接！", errInvalid: "无效链接！", msgCopied: "已复制！", pasteTooltip: "从剪贴板粘贴" },
         es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega tu enlace aquí...", btnConvert: "Convertir", labelResult: "Tu Enlace Directo:", btnCopy: "Copiar Enlace", labelPreview: "Vista Previa:", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", pasteTooltip: "Pegar desde portapapeles" },
@@ -169,7 +157,13 @@
 
     let currentLang = 'tr';
     var sonIslenenLink = "";
-    var dinamikModAktif = false; // Sadece hata alındığında true olur
+    var dinamikModAktif = false; 
+
+    // GÜVENLİK İÇİN YENİ SIKI REGEX (KURŞUN GEÇİRMEZ)
+    // 1. "drive.google.com" içermeli
+    // 2. "/d/" içermeli
+    // 3. ID kısmı en az 25 karakter olmalı ve sadece harf/rakam/_/- içermeli
+    const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
     function changeLanguage() {
         const select = document.getElementById('languageSelect');
@@ -190,19 +184,15 @@
 
         var btnConvert = document.getElementById('btnConvert');
         if (btnConvert.classList.contains('passive')) {
-            dinamikKontrol(); // Pasifse hatayı o anki dilde güncelle
+            dinamikKontrol();
         } else if (!btnConvert.classList.contains('error-shake')) {
             btnConvert.innerText = t.btnConvert;
         }
     }
 
-    // --- AKILLI KONTROL SİSTEMİ ---
     function dinamikKontrol() {
-        // Değişiklik olduğu an hafızayı sil
         sonIslenenLink = ""; 
 
-        // Eğer sistem "Cezalı" (Dinamik) modda değilse (yani site yeni açıldıysa veya son işlem başarılıysa)
-        // hiçbir kontrol yapma, buton Mavi kalsın.
         if (!dinamikModAktif) return;
 
         var inputElement = document.getElementById("driveLink");
@@ -210,28 +200,25 @@
         var btn = document.getElementById("btnConvert");
         const t = translations[currentLang];
 
-        // 1. Boş Kontrolü
         if (val === "") {
             btn.classList.add("passive"); 
             btn.innerText = t.errEmpty;   
             return;
         }
 
-        // 2. Format Kontrolü
-        var isValid = val.match(/\/d\/(.+?)\//);
+        // YENİ GÜVENLİ REGEX KULLANIMI
+        var isValid = val.match(driveRegex);
         
         if (!isValid) {
             btn.classList.add("passive"); 
             btn.innerText = t.errInvalid; 
         } else {
-            // DOĞRU FORMAT: Butonu serbest bırak
             btn.classList.remove("passive"); 
             btn.innerText = t.btnConvert;    
         }
     }
 
     function linkDonustur() {
-        // Eğer dinamik modda buton pasifse işlem yapma (Ek güvenlik)
         var btn = document.getElementById("btnConvert");
         if(btn.classList.contains('passive')) return;
 
@@ -239,31 +226,28 @@
         var val = inputElement.value.trim();
         const t = translations[currentLang];
 
-        // 1. BOŞ KONTROLÜ
         if(val === "") { 
             hataAnimasyonu(t.errEmpty);
             return; 
         } 
 
-        // 2. GEREKSİZ TIKLAMA ENGELİ
         if(val === sonIslenenLink) {
             return; 
         }
 
-        // 3. HTTPS DÜZELTME
+        // HTTPS DÜZELTME
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
             val = "https://" + val;
             inputElement.value = val; 
         }
 
-        // 4. FORMAT KONTROLÜ
-        var idMatch = val.match(/\/d\/(.+?)\//);
+        // GÜVENLİ REGEX KONTROLÜ
+        var idMatch = val.match(driveRegex);
         if (!idMatch) {
             hataAnimasyonu(t.errInvalid);
             return;
         }
 
-        // --- İŞLEM BAŞARILI ---
         var fileID = idMatch[1];
         var newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
 
@@ -274,12 +258,8 @@
         document.getElementById("previewImg").src = newLink;
         document.getElementById("resultArea").style.display = "block";
         
-        // --- KRİTİK NOKTA: SIFIRLAMA ---
-        // İşlem başarılı oldu, artık "Saf Mod"a geri dönüyoruz.
-        // Kullanıcı buradan sonra silse de yanlış yazsa de buton Mavi kalacak
-        // ta ki basıp hata alana kadar.
         sonIslenenLink = val; 
-        dinamikModAktif = false; // CEZAYI KALDIR
+        dinamikModAktif = false; // SIFIRLAMA BAŞARILI
 
         butonSifirla();
     }
@@ -290,13 +270,10 @@
         btn.classList.add("error-shake");
         btn.innerText = mesaj;
 
-        // HATA ALDIĞI İÇİN CEZA SİSTEMİNİ (Dinamik Mod) BAŞLAT
         dinamikModAktif = true;
 
         setTimeout(function() {
             btn.classList.remove("error-shake");
-            
-            // Animasyon bitti, şimdi butonu kilitle
             btn.classList.add("passive");
         }, 1000);
     }
@@ -310,9 +287,7 @@
             btn.innerText = t.msgCopied;
             btn.style.backgroundColor = "#198754"; 
             btn.disabled = true; 
-            
             finalDiv.style.color = "#198754"; 
-
             setTimeout(function(){ butonSifirla(); }, 1000);
         }, function(err) {
             alert("Error: " + err);
@@ -322,7 +297,6 @@
     function butonSifirla() {
         var btn = document.getElementById("btnCopy");
         const t = translations[currentLang];
-        
         btn.innerText = t.btnCopy;
         btn.style.backgroundColor = "#fd7e14"; 
         btn.disabled = false; 
@@ -336,7 +310,7 @@
             const text = await navigator.clipboard.readText();
             var processedText = text.trim();
 
-            if (processedText.match(/\/d\/(.+?)\//) && !processedText.startsWith("http")) {
+            if (processedText.match(driveRegex) && !processedText.startsWith("http")) {
                 processedText = "https://" + processedText;
             }
 
@@ -344,13 +318,13 @@
 
             inputAlani.value = processedText;
             
-            // Yapıştırma sonrası kontrol
             dinamikKontrol();
 
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 1500);
 
-            if (processedText.match(/\/d\/(.+?)\//)) {
+            // Yapıştırırken de sıkı Regex ile kontrol et
+            if (processedText.match(driveRegex)) {
                 linkDonustur();
             }
 
