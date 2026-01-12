@@ -25,15 +25,30 @@
             padding: 5px 10px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 600; /* Yazı biraz daha tok dursun */
+            color: #333;      /* İkon ve yazı rengi siyah */
+            
+            /* HİZALAMA AYARLARI */
             display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: background 0.2s;
+            align-items: center; /* Dikeyde tam ortalar */
+            justify-content: center;
+            gap: 6px; /* İkon ile yazı arasındaki boşluk */
+            height: 32px; /* Sabit yükseklik verip garantiye aldık */
+            
+            transition: background 0.2s, border-color 0.2s;
         }
-        .lang-btn:hover { background: #f8f9fa; }
+        .lang-btn:hover { background: #f8f9fa; border-color: #bbb; }
+
+        /* SVG İkon Ayarı */
+        .lang-icon {
+            width: 16px;
+            height: 16px;
+            fill: #333; /* Simsiyah renk */
+            display: block; /* Satır içi boşlukları öldürür */
+        }
 
         .lang-list {
-            display: none; /* Başlangıçta gizli */
+            display: none; 
             position: absolute;
             top: 100%;
             right: 0;
@@ -54,6 +69,7 @@
             cursor: pointer;
             font-size: 13px;
             border-bottom: 1px solid #f0f0f0;
+            color: #333;
         }
         .lang-list li:last-child { border-bottom: none; }
         .lang-list li:hover { background-color: #f0f0f0; }
@@ -61,7 +77,6 @@
         /* INPUT GROUP */
         .input-group { display: flex; align-items: center; margin: 10px 0; }
 
-        /* Metin Kutusu */
         input[type="text"] { 
             flex: 1; padding: 12px; border: 1px solid #ddd; 
             border-top-left-radius: 4px; border-bottom-left-radius: 4px; 
@@ -70,10 +85,8 @@
             transition: border-color 0.3s; font-size: 14px;
         }
 
-        /* BUTON ANİMASYONLARI */
         button:active { transform: scale(0.96); }
 
-        /* Yapıştır Butonu */
         .paste-btn {
             background-color: #6c757d; color: white; border: 1px solid #6c757d;
             border-top-right-radius: 4px; border-bottom-right-radius: 4px;
@@ -84,7 +97,6 @@
         .paste-btn:hover { background-color: #5c636a; }
         .paste-btn svg { width: 22px; height: 22px; fill: white; }
 
-        /* DÖNÜŞTÜR BUTONU */
         .convert-btn { 
             background-color: #0d6efd; color: white; padding: 12px 20px; 
             border: none; border-radius: 4px; cursor: pointer; width: 100%; 
@@ -99,7 +111,6 @@
             transform: none !important; 
             pointer-events: none; 
         }
-
         .convert-btn.success-lock:active { transform: none !important; }
         .convert-btn.success-lock { cursor: default; }
 
@@ -112,11 +123,8 @@
 
         .result-box { margin-top: 25px; padding: 15px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; word-break: break-all; display: none; }
 
-        /* KOPYALA BUTONU (SAĞA YASLI) */
         .copy-btn { 
-            margin-top: 10px; 
-            background-color: #fd7e14; 
-            color: white; border: none;
+            margin-top: 10px; background-color: #fd7e14; color: white; border: none;
             padding: 8px 15px; border-radius: 4px; font-size: 13px; cursor: pointer;
             min-width: 140px; 
             display: block; margin-left: auto; margin-right: 0;     
@@ -138,50 +146,29 @@
             transition: color 0.3s; 
         }
 
-        /* --- ÖNİZLEME & LIGHTBOX --- */
+        /* LIGHTBOX */
         #previewImg {
-            max-width: 100%; 
-            height: auto; 
-            max-height: 120px; /* Küçük Önizleme */
-            border-radius: 4px; 
-            margin-top: 5px;
-            cursor: zoom-in; /* Büyüteç imleci */
-            transition: opacity 0.2s;
-            display: block;
+            max-width: 100%; height: auto; max-height: 120px; 
+            border-radius: 4px; margin-top: 5px; cursor: zoom-in; 
+            transition: opacity 0.2s; display: block;
         }
         #previewImg:hover { opacity: 0.9; }
 
-        /* Modal (Lightbox) */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            left: 0; top: 0; 
-            width: 100%; height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.85); /* Koyu Arka Plan */
+            display: none; position: fixed; z-index: 1000; 
+            left: 0; top: 0; width: 100%; height: 100%; 
+            overflow: auto; background-color: rgba(0,0,0,0.85); 
             backdrop-filter: blur(2px);
         }
         .modal-content {
-            margin: auto;
-            display: block;
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 5px;
-            box-shadow: 0 0 20px rgba(255,255,255,0.2);
-            position: relative;
-            top: 50%;
-            transform: translateY(-50%);
+            margin: auto; display: block; max-width: 90%; max-height: 90%;
+            border-radius: 5px; box-shadow: 0 0 20px rgba(255,255,255,0.2);
+            position: relative; top: 50%; transform: translateY(-50%);
         }
         .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: #f1f1f1;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            z-index: 1001;
+            position: absolute; top: 20px; right: 30px; 
+            color: #f1f1f1; font-size: 40px; font-weight: bold; 
+            cursor: pointer; z-index: 1001;
         }
     </style>
 </head>
@@ -195,7 +182,10 @@
 <div class="container">
     <div class="lang-wrapper">
         <button class="lang-btn" onclick="toggleLangMenu(event)">
-            <span style="font-size: 16px;">🌐</span> 
+            <svg class="lang-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM2.04 4.326c.325 1.329 2.532 2.54 6.354 2.919V5.256c-4.42-1.379-6.354-2.919-6.354-2.919zm.344 7.625c.325-1.329 2.532-2.54 6.354-2.919v5.733c-3.822-.38-6.029-1.59-6.354-2.919zm11.576-7.625c-.325 1.329-2.532 2.54-6.354 2.919V5.256c4.42-1.379 6.354-2.919 6.354-2.919zm-.344 7.625c-.325-1.329-2.532-2.54-6.354-2.919v5.733c3.822-.38 6.029-1.59 6.354-2.919z"/>
+                <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-6.923c-.67.204-1.335.82-1.887 1.855A7.97 7.97 0 0 0 5.145 4H7.5V1.077zM4.09 4a9.267 9.267 0 0 1 .64-1.539 6.7 6.7 0 0 1 .597-.933A7.025 7.025 0 0 0 2.255 4H4.09zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a6.958 6.958 0 0 0-.656 2.5h2.49zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5H4.847zM8.5 5v2.5h2.99a12.495 12.495 0 0 0-.337-2.5H8.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5H4.51zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5H8.5zM5.145 12c.138.386.295.744.468 1.068.552 1.035 1.218 1.65 1.887 1.855V12H5.145zm.182 2.472a6.696 6.696 0 0 1-.597-.933A9.268 9.268 0 0 1 4.09 12H2.255a7.024 7.024 0 0 0 3.072 2.472zM3.82 11a13.652 13.652 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5H3.82zm6.853 3.472A7.024 7.024 0 0 0 13.745 12H11.91a9.27 9.27 0 0 1-.64 1.539 6.688 6.688 0 0 1-.597.933zM8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855.173-.324.33-.682.468-1.068H8.5zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.65 13.65 0 0 1-.312 2.5zm2.802-3.5a6.959 6.959 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5h2.49zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7.024 7.024 0 0 0-3.072-2.472c.218.284.418.598.597.933zM10.855 4a7.966 7.966 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4h2.355z"/>
+            </svg>
             <span id="currentLangLabel">TR</span>
         </button>
         <ul class="lang-list" id="langList">
@@ -261,65 +251,38 @@
     var dinamikModAktif = false; 
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
-    // --- DİL MENÜSÜ FONKSİYONLARI ---
-    
-    // Global tıklama sayacı (Menü dışına kaç kere tıklandı?)
-    var disTiklamaSayisi = 0;
-
     function toggleLangMenu(event) {
-        event.stopPropagation(); // Tıklamanın document'e gitmesini engelle
+        event.stopPropagation();
         var list = document.getElementById("langList");
-        
-        if (list.style.display === "block") {
-            list.style.display = "none";
-            disTiklamaSayisi = 0; // Kapatınca sayacı sıfırla
-        } else {
-            list.style.display = "block";
-            disTiklamaSayisi = 0; // Açınca sayacı sıfırla
-        }
+        list.style.display = (list.style.display === "block") ? "none" : "block";
     }
 
-    // Bir dil seçildiğinde
     function selectLang(code) {
         currentLang = code;
         document.getElementById("currentLangLabel").innerText = code.toUpperCase();
-        
-        // Menüyü kapat
         document.getElementById("langList").style.display = "none";
-        disTiklamaSayisi = 0;
-
-        // Çevirileri uygula
         applyTranslations();
     }
 
-    // Belgeye tıklama dinleyicisi (3 Tıklama Kuralı)
+    // --- TEK TIKLAMA İLE KAPATMA (BASİTLEŞTİRİLMİŞ) ---
     document.addEventListener('click', function(event) {
         var list = document.getElementById("langList");
         var btn = document.querySelector(".lang-btn");
 
-        // Eğer menü açıksa
         if (list.style.display === "block") {
-            // Tıklanan yer menü veya buton DEĞİLSE
+            // Eğer tıklanan yer menü veya buton değilse KAPAT
             if (!list.contains(event.target) && !btn.contains(event.target)) {
-                disTiklamaSayisi++;
-                
-                // 3. tıklayışta gizle
-                if (disTiklamaSayisi >= 3) {
-                    list.style.display = "none";
-                    disTiklamaSayisi = 0;
-                }
+                list.style.display = "none";
             }
         }
     });
 
     function applyTranslations() {
         const t = translations[currentLang];
-        
         document.querySelectorAll('[data-lang]').forEach(el => {
             const key = el.getAttribute('data-lang');
             if (t[key]) el.innerText = t[key];
         });
-
         document.getElementById('driveLink').placeholder = t.placeholder;
         document.getElementById('btnPaste').title = t.pasteTooltip;
 
@@ -338,7 +301,6 @@
         }
     }
 
-    // --- LIGHTBOX İŞLEMLERİ ---
     function openModal(src) {
         var modal = document.getElementById("imgModal");
         var modalImg = document.getElementById("fullImage");
@@ -347,29 +309,23 @@
             modalImg.src = src;
         }
     }
-
     function closeModal() {
         document.getElementById("imgModal").style.display = "none";
     }
 
-    // --- DİĞER FONKSİYONLAR (AYNEN KORUNDU) ---
     function dinamikKontrol() {
         sonIslenenLink = ""; 
         document.getElementById("btnConvert").classList.remove("success-lock");
-
         if (!dinamikModAktif) return;
-
         var inputElement = document.getElementById("driveLink");
         var val = inputElement.value.trim();
         var btn = document.getElementById("btnConvert");
         const t = translations[currentLang];
-
         if (val === "") {
             btn.classList.add("passive"); 
             btn.innerText = t.errEmpty;   
             return;
         }
-
         var isValid = val.match(driveRegex);
         if (!isValid) {
             btn.classList.add("passive"); 
@@ -383,27 +339,21 @@
     function linkDonustur() {
         var btn = document.getElementById("btnConvert");
         if(btn.classList.contains('passive')) return;
-
         var inputElement = document.getElementById("driveLink");
         var val = inputElement.value.trim();
         const t = translations[currentLang];
 
         if(val === "") { 
-            hataAnimasyonu(t.errEmpty);
-            return; 
+            hataAnimasyonu(t.errEmpty); return; 
         } 
-        if(val === sonIslenenLink) {
-            return; 
-        }
+        if(val === sonIslenenLink) { return; }
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) {
-            val = "https://" + val;
-            inputElement.value = val; 
+            val = "https://" + val; inputElement.value = val; 
         }
 
         var idMatch = val.match(driveRegex);
         if (!idMatch) {
-            hataAnimasyonu(t.errInvalid);
-            return;
+            hataAnimasyonu(t.errInvalid); return;
         }
 
         var fileID = idMatch[1];
@@ -412,16 +362,13 @@
         var finalDiv = document.getElementById("finalLink");
         finalDiv.innerText = newLink;
         finalDiv.style.color = "#333"; 
-
-        // Önizleme ve Modal Src Ayarla
+        
         var img = document.getElementById("previewImg");
         img.src = newLink;
         
         document.getElementById("resultArea").style.display = "block";
-        
         sonIslenenLink = val; 
         dinamikModAktif = false; 
-
         btn.classList.add("success-lock");
         butonSifirla();
     }
@@ -442,17 +389,13 @@
         var finalDiv = document.getElementById("finalLink");
         var btn = document.getElementById("btnCopy");
         const t = translations[currentLang];
-
         navigator.clipboard.writeText(finalDiv.innerText).then(function() {
             btn.innerText = t.msgCopied;
             btn.style.backgroundColor = "#198754"; 
-            
             finalDiv.style.color = "#198754"; 
-
             btn.classList.remove("text-blink");
             void btn.offsetWidth; 
             btn.classList.add("text-blink");
-
         }, function(err) {
             alert("Error: " + err);
         });
@@ -469,28 +412,20 @@
     async function yapistir() {
         var inputAlani = document.getElementById("driveLink");
         var pasteBtn = document.getElementById("btnPaste");
-
         try {
             const text = await navigator.clipboard.readText();
             var processedText = text.trim();
-
             if (processedText.match(driveRegex) && !processedText.startsWith("http")) {
                 processedText = "https://" + processedText;
             }
-
             if (inputAlani.value === processedText) return; 
-
             inputAlani.value = processedText;
-            
             dinamikKontrol();
-
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 1500);
-
             if (processedText.match(driveRegex)) {
                 linkDonustur();
             }
-
         } catch (err) {
             console.error("Hata:", err);
             inputAlani.value = "";
