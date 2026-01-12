@@ -19,6 +19,7 @@
             border-top-left-radius: 4px; border-bottom-left-radius: 4px; 
             border-top-right-radius: 0; border-bottom-right-radius: 0; 
             border-right: none; height: 40px; box-sizing: border-box;
+            transition: border-color 0.3s;
         }
 
         /* Yapıştır Butonu */
@@ -36,9 +37,24 @@
         .convert-btn { 
             background-color: #0d6efd; color: white; padding: 10px 20px; 
             border: none; border-radius: 4px; cursor: pointer; width: 100%; 
-            font-size: 14px; margin-bottom: 5px; transition: background-color 0.2s;
+            font-size: 14px; margin-bottom: 5px; transition: all 0.2s;
         }
         .convert-btn:hover { background-color: #0b5ed7; }
+
+        /* HATA ANİMASYONU (Sallanma Efekti) */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* Bu sınıf JS ile eklendiğinde buton sallanır ve kırmızı olur */
+        .error-shake {
+            animation: shake 0.3s ease-in-out;
+            background-color: #dc3545 !important; /* Kırmızı */
+        }
 
         /* SONUÇ ALANI */
         .result-box { margin-top: 20px; padding: 10px; background-color: #e9ecef; border: 1px solid #ced4da; border-radius: 4px; word-break: break-all; display: none; }
@@ -77,7 +93,7 @@
         </button>
     </div>
     
-    <button class="convert-btn" onclick="linkDonustur()">Dönüştür</button>
+    <button id="btnConvert" class="convert-btn" onclick="linkDonustur()">Dönüştür</button>
 
     <div class="result-box" id="resultArea">
         <label class="label">Direkt Resim Linkin:</label>
@@ -93,7 +109,13 @@
 <script>
     function linkDonustur() {
         var inputLink = document.getElementById("driveLink").value;
-        if(!inputLink) { return; } 
+        var btn = document.getElementById("btnConvert");
+
+        // Link boşsa veya format yanlışsa
+        if(!inputLink || !inputLink.match(/\/d\/(.+?)\//)) { 
+            hataAnimasyonu();
+            return; 
+        } 
 
         var idMatch = inputLink.match(/\/d\/(.+?)\//);
 
@@ -106,6 +128,24 @@
             document.getElementById("resultArea").style.display = "block";
             butonSifirla();
         } 
+    }
+
+    // --- HATA ANİMASYONU FONKSİYONU ---
+    function hataAnimasyonu() {
+        var btn = document.getElementById("btnConvert");
+        var orjinalMetin = btn.innerText;
+
+        // 1. Sınıf ekle (Sallama ve Kırmızı Renk)
+        btn.classList.add("error-shake");
+        
+        // 2. Metni değiştir
+        btn.innerText = "Geçersiz Link!";
+
+        // 3. 1 Saniye sonra eski haline döndür
+        setTimeout(function() {
+            btn.classList.remove("error-shake");
+            btn.innerText = orjinalMetin;
+        }, 1000);
     }
 
     function kopyala() {
@@ -139,14 +179,16 @@
             const text = await navigator.clipboard.readText();
             inputAlani.value = text;
             
-            // BURADAN "select()" KOMUTUNU KALDIRDIM.
-            // Artık yapıştırınca metin seçili kalmayacak.
-            
+            // Başarılı (Yeşil)
             pasteBtn.style.backgroundColor = "#198754"; 
             setTimeout(function() { pasteBtn.style.backgroundColor = ""; }, 500);
 
+            // Eğer format doğruysa otomatik dönüştür
             if (text.match(/\/d\/(.+?)\//)) {
                 linkDonustur();
+            } else {
+                // Eğer format yanlışsa otomatik dönüştürmeye çalışma
+                // (Kullanıcı manuel basarsa zaten sallanacak)
             }
 
         } catch (err) {
