@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Gallery Pro V21</title>
+    <title>Drive Gallery Pro V23</title>
     <style>
         /* --- TEMEL AYARLAR --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
-        .container { position: relative; max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .container { position: relative; max-width: 850px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .label { font-weight: bold; margin-top: 15px; display: block; margin-bottom: 5px; color: #333; }
 
         /* --- DİL MENÜSÜ --- */
@@ -117,7 +117,6 @@
 
         .hide-nav .lb-btn, .hide-nav .lb-right-group { display: none !important; }
 
-        /* Alt Kontrol Barı */
         .lb-bottom-bar {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             display: flex; justify-content: space-between; align-items: center;
@@ -173,12 +172,13 @@
         .close-details { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
         .close-details:hover { color: black; }
 
-        /* TABLO YAPISI (GRID -> Gap Azaltıldı: 5px) */
+        /* TABLO YAPISI (DÜZELTİLDİ: Resim Büyüdü, Boşluk Eşitlendi) */
         .link-list-container { display: flex; flex-direction: column; gap: 10px; }
         .link-row { 
             display: grid; 
-            grid-template-columns: 70px 1fr auto auto; 
-            gap: 5px; /* MESAFE KISALTILDI */
+            /* Sütunlar: Resim (80px) | Link | Kopyala | Sil */
+            grid-template-columns: 80px 1fr auto auto; 
+            gap: 15px; /* EŞİT BOŞLUK */
             align-items: center; 
             border-bottom: 1px solid #eee; 
             padding-bottom: 10px; 
@@ -186,11 +186,14 @@
         .link-row:last-child { border-bottom: none; }
         
         .link-header { 
-            display: grid; grid-template-columns: 70px 1fr auto auto; gap: 5px; 
+            display: grid; grid-template-columns: 80px 1fr auto auto; gap: 15px; 
             background: #f2f2f2; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 5px;
         }
 
-        .tbl-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; }
+        .tbl-thumb { 
+            width: 80px; height: 80px; /* RESİM ALANI ARTTIRILDI */
+            object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; 
+        }
         
         .link-text-wrapper {
             overflow: hidden; 
@@ -206,9 +209,9 @@
         }
         .link-text::-webkit-scrollbar { display: none; }
 
-        .btn-copy-sm { background: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; margin: 0; }
+        .btn-copy-sm { background: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
         .btn-copy-sm:hover { background: #5c636a; }
-        .btn-danger-sm { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; margin: 0; }
+        .btn-danger-sm { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
         .btn-danger-sm:hover { background: #bb2d3b; }
 
         .btn-footer { padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; border: none; display: flex; align-items: center; gap: 8px; color: white; font-weight: 500; }
@@ -364,6 +367,7 @@
     const translations = {
         tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "Linkleri buraya yapıştırın (Virgülle ayırabilirsiniz)...", btnConvert: "Dönüştür", labelGallery: "Oluşturulan Resimler:", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", btnDeleteSelected: "Seçilenleri Sil", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tümünü Kopyala", btnExcel: "Excel İndir", confirmTitle: "Silme Onayı", confirmDelAll: "Tüm galeri silinecek. Emin misiniz?", confirmDelOne: "Bu resmi silmek istediğinize emin misiniz?", confirmDelSel: "Seçilen resimleri silmek istediğinize emin misiniz?", btnYes: "Evet, Sil", btnNo: "İptal", pasteTooltip: "Panodan Yapıştır" },
         en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste links here (comma separated)...", btnConvert: "Convert", labelGallery: "Generated Images:", btnDetails: "Detailed List", btnClear: "Clear All", btnDeleteSelected: "Delete Selected", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All", btnExcel: "Download Excel", confirmTitle: "Delete Confirmation", confirmDelAll: "All gallery will be deleted. Are you sure?", confirmDelOne: "Are you sure you want to delete this image?", confirmDelSel: "Are you sure you want to delete selected images?", btnYes: "Yes, Delete", btnNo: "Cancel", pasteTooltip: "Paste from Clipboard" },
+        zh: { title: "Google Drive 直接链接生成器", labelInput: "原始 Drive 链接：", placeholder: "在此处粘贴链接（以逗号分隔）...", btnConvert: "转换", labelGallery: "生成的图片：", btnDetails: "详细列表", btnClear: "全部清除", btnDeleteSelected: "删除所选", errEmpty: "未输入链接！", errInvalid: "无效链接！", msgCopied: "已复制！", btnCopy: "复制", modalTitle: "生成的链接", thImage: "图片", thDirect: "直接链接", thAction: "操作", btnDelete: "删除", btnCopyAll: "复制全部", btnExcel: "下载 Excel", confirmTitle: "删除确认", confirmDelAll: "所有图库都将被删除。你确定吗？", confirmDelOne: "您确定要删除此图片吗？", confirmDelSel: "您确定要删除所选图片吗？", btnYes: "是，删除", btnNo: "取消", pasteTooltip: "从剪贴板粘贴" },
         de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Links hier einfügen...", btnConvert: "Umwandeln", labelGallery: "Generierte Bilder:", btnDetails: "Detaillierte Liste", btnClear: "Alles löschen", btnDeleteSelected: "Ausgewählte löschen", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", btnCopy: "Kopieren", modalTitle: "Generierte Links", thImage: "Bild", thDirect: "Direktlink", thAction: "Aktion", btnDelete: "Löschen", btnCopyAll: "Alles Kopieren", btnExcel: "Excel Herunterladen", confirmTitle: "Löschbestätigung", confirmDelAll: "Die gesamte Galerie wird gelöscht. Sind Sie sicher?", confirmDelOne: "Möchten Sie dieses Bild wirklich löschen?", confirmDelSel: "Möchten Sie die ausgewählten Bilder löschen?", btnYes: "Ja, Löschen", btnNo: "Abbrechen", pasteTooltip: "Aus Zwischenablage einfügen" },
         fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez les liens ici...", btnConvert: "Convertir", labelGallery: "Images générées :", btnDetails: "Liste détaillée", btnClear: "Tout effacer", btnDeleteSelected: "Supprimer la sélection", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", btnCopy: "Copier", modalTitle: "Liens générés", thImage: "Image", thDirect: "Lien direct", thAction: "Action", btnDelete: "Supprimer", btnCopyAll: "Tout Copier", btnExcel: "Télécharger Excel", confirmTitle: "Confirmation de suppression", confirmDelAll: "Toute la galerie sera supprimée. Êtes-vous sûr ?", confirmDelOne: "Êtes-vous sûr de vouloir supprimer cette image ?", confirmDelSel: "Êtes-vous sûr de vouloir supprimer les images sélectionnées ?", btnYes: "Oui, Supprimer", btnNo: "Annuler", pasteTooltip: "Coller depuis le presse-papiers" },
         es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega los enlaces aquí...", btnConvert: "Convertir", labelGallery: "Imágenes Generadas:", btnDetails: "Lista Detallada", btnClear: "Borrar Todo", btnDeleteSelected: "Eliminar Seleccionados", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", btnCopy: "Copiar", modalTitle: "Enlaces Generados", thImage: "Imagen", thDirect: "Enlace Directo", thAction: "Acción", btnDelete: "Eliminar", btnCopyAll: "Copiar Todo", btnExcel: "Descargar Excel", confirmTitle: "Confirmación de eliminación", confirmDelAll: "¿Se eliminará toda la galería. Estás seguro?", confirmDelOne: "¿Estás seguro de que quieres eliminar esta imagen?", confirmDelSel: "¿Estás seguro de que quieres eliminar las imágenes seleccionadas?", btnYes: "Sí, Eliminar", btnNo: "Cancelar", pasteTooltip: "Pegar desde portapapeles" },
@@ -631,9 +635,7 @@
         if (e.deltaY < 0) zoomImage(0.2); else zoomImage(-0.2);
     }
 
-    // KEYBOARD ZOOM STATE
-    let keyZoomInterval = null;
-    let activeZoomKey = null;
+    let activeZoomKey = null; // Klavye zoom state
 
     function lightboxKeyHandler(e) {
         if(!document.getElementById("lightboxModal").classList.contains("hide-nav")) {
@@ -644,16 +646,15 @@
         if (e.key.toLowerCase() === "c") copyFromLightbox();
         if (e.key === "Delete" || e.key === "Backspace") deleteFromLightbox();
         
-        // Continuous Keyboard Zoom
+        // Klavye ile Continuous Zoom
         if ((e.key === "+" || e.key === "Add" || e.key === "-" || e.key === "Subtract") && !e.repeat) {
-            if (activeZoomKey) return; // Zaten basılıysa çık
+            if (activeZoomKey) return; 
             activeZoomKey = e.key;
             let amount = (e.key === "+" || e.key === "Add") ? 0.2 : -0.2;
             startZoom(amount);
         }
     }
     
-    // Keyup ile zoom durdurma
     document.addEventListener('keyup', (e) => {
         if (e.key === activeZoomKey || e.key === "+" || e.key === "Add" || e.key === "-" || e.key === "Subtract") {
             stopZoom();
