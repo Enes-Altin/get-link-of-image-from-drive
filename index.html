@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Gallery Pro V24</title>
+    <title>Drive Gallery Pro V25</title>
     <style>
         /* --- TEMEL AYARLAR --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
@@ -57,9 +57,10 @@
         .gallery-item {
             position: relative; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; aspect-ratio: 1; background: #eee;
             cursor: zoom-in; transition: transform 0.2s, border-color 0.2s;
+            user-select: none; /* Shift seçimi için metin seçimini engelle */
         }
         .gallery-item:hover { transform: scale(1.02); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.2s; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.2s; pointer-events: none; /* Tıklamayı div'e bırak */ }
         
         @keyframes flashEffect { 0% { filter: brightness(1); } 50% { filter: brightness(1.8) sepia(0.5) hue-rotate(90deg); } 100% { filter: brightness(1); } }
         .flash-anim { animation: flashEffect 0.4s ease-out; }
@@ -71,7 +72,7 @@
             position: absolute; top: 5px; right: 5px; background: rgba(255, 255, 255, 0.9);
             border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px;
             display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0;
-            transition: opacity 0.2s, background-color 0.2s; z-index: 5;
+            transition: opacity 0.2s, background-color 0.2s; z-index: 5; pointer-events: auto;
         }
         .gallery-item:hover .overlay-copy-btn { opacity: 1; }
         .overlay-copy-btn:hover { background: #fd7e14; border-color: #fd7e14; color: white; }
@@ -93,6 +94,7 @@
         }
         #detailsModal { z-index: 1000; background-color: rgba(0,0,0,0.6); }
         #lightboxModal { z-index: 2000; background-color: rgba(0,0,0,0.95); }
+        /* Confirm en üstte */
         #confirmModal { z-index: 3000; background-color: rgba(0,0,0,0.5); }
 
         /* --- LIGHTBOX --- */
@@ -117,7 +119,6 @@
 
         .hide-nav .lb-btn, .hide-nav .lb-right-group { display: none !important; }
 
-        /* Alt Kontrol Barı */
         .lb-bottom-bar {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             display: flex; justify-content: space-between; align-items: center;
@@ -165,18 +166,16 @@
         /* --- DETAY TABLOSU --- */
         .details-modal-content {
             background-color: #fefefe; margin: 5% auto; border: 1px solid #888;
-            width: 90%; max-width: 800px; /* Biraz daralttık */
+            width: 88%; /* Kenarlardan biraz daraltıldı (User Req) */
+            max-width: 800px; 
             border-radius: 8px; display: flex; flex-direction: column; max-height: 90vh;
         }
         .details-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         
-        /* SCROLLBAR TASARIMI */
         .details-body { 
             overflow-y: auto; padding: 20px; 
-            /* Firefox */
             scrollbar-width: thin; scrollbar-color: #ccc #f1f1f1;
         }
-        /* Chrome/Edge/Safari */
         .details-body::-webkit-scrollbar { width: 8px; }
         .details-body::-webkit-scrollbar-track { background: #f1f1f1; }
         .details-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -186,24 +185,24 @@
         .close-details { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
         .close-details:hover { color: black; }
 
-        /* TABLO YAPISI (GRID - SIKI DÜZEN) */
+        /* TABLO YAPISI (GRID - BOŞLUKLAR AYARLANDI) */
         .link-list-container { display: flex; flex-direction: column; gap: 10px; }
         .link-row { 
             display: grid; 
-            /* 80px Resim | 340px Sabit Link | Auto Kopyala | Auto Sil */
+            /* 80px Resim | 340px Link | Auto | Auto */
             grid-template-columns: 80px 340px auto auto; 
-            gap: 15px; /* EŞİT MESAFE (User Request) */
+            gap: 18px; /* BOŞLUK BİRAZ AÇILDI (User Req) */
             align-items: center; 
-            justify-content: center; /* ORTALA */
+            justify-content: center; 
             border-bottom: 1px solid #eee; 
             padding-bottom: 10px; 
         }
         .link-row:last-child { border-bottom: none; }
         
         .link-header { 
-            display: grid; grid-template-columns: 80px 340px auto auto; gap: 15px; 
+            display: grid; grid-template-columns: 80px 340px auto auto; gap: 18px; /* Header da aynı boşlukta */
             background: #f2f2f2; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 5px;
-            justify-content: center; /* BAŞLIĞI DA ORTALA */
+            justify-content: center;
         }
 
         .tbl-thumb { 
@@ -214,8 +213,8 @@
         .link-text-wrapper {
             overflow: hidden; 
             background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 4px;
-            display: flex; align-items: center; 
-            width: 100%; height: 40px; /* Yükseklik sabitleme */
+            display: flex; align-items: center; min-width: 0;
+            max-width: 400px; 
         }
         .link-text {
             overflow-x: auto; white-space: nowrap; 
@@ -394,19 +393,24 @@
         ja: { title: "Google Drive 直リンク作成ツール", labelInput: "元のリンク:", placeholder: "ここにリンクを貼り付け...", btnConvert: "変換", labelGallery: "生成された画像:", btnDetails: "詳細リスト", btnClear: "すべてクリア", btnDeleteSelected: "選択項目を削除", errEmpty: "リンク未入力！", errInvalid: "無効なリンクです!", msgCopied: "コピーしました!", btnCopy: "コピー", modalTitle: "生成されたリンク", thImage: "画像", thDirect: "直リンク", thAction: "操作", btnDelete: "削除", btnCopyAll: "すべてコピー", btnExcel: "Excelをダウンロード", confirmTitle: "削除の確認", confirmDelAll: "すべてのギャラリーが削除されます。よろしいですか？", confirmDelOne: "この画像を削除してもよろしいですか？", confirmDelSel: "選択した画像を削除してもよろしいですか？", btnYes: "はい、削除", btnNo: "キャンセル", pasteTooltip: "クリップボードから貼り付け" }
     };
 
-    // --- GLOBAL TIKLAMA ---
+    // --- GLOBAL TIKLAMA VE STACK MANTIĞI ---
     function handleGlobalClick(e) {
+        // Modal Kapama Önceliği: Confirm -> Lightbox -> Details
         if(e.target.classList.contains('modal')) {
-            if(e.target.id === 'lightboxModal') closeLightbox();
-            if(e.target.id === 'detailsModal') closeDetails();
             if(e.target.id === 'confirmModal') closeConfirm();
+            else if(e.target.id === 'lightboxModal') closeLightbox();
+            else if(e.target.id === 'detailsModal') closeDetails();
         }
+        
         let l = document.getElementById("langList");
         let b = document.querySelector(".lang-btn");
         if(l.style.display === "block" && !l.contains(e.target) && !b.contains(e.target)) {
             l.style.display = "none";
         }
+        
+        // Sticky Selection İptali (Boşluğa tıklanırsa)
         if(selectedIndices.length > 0) {
+            // Eğer tıklanan yer galeri item'ı veya silme butonu DEĞİLSE
             if(!e.target.closest('.gallery-item') && !e.target.closest('#btnDelSel')) {
                 selectedIndices = []; renderGallery(); 
             }
@@ -425,14 +429,6 @@
         if(document.getElementById("detailsModal").style.display === "block") showDetails(); 
     }
 
-    function closeIfBackdrop(e, modalId) {
-        if(e.target === document.getElementById(modalId)) {
-            if(modalId === 'lightboxModal') closeLightbox();
-            if(modalId === 'detailsModal') closeDetails();
-            if(modalId === 'confirmModal') closeConfirm();
-        }
-    }
-    
     function closeIfContainerClick(e) {
         if(e.target.classList.contains('lightbox-container')) closeLightbox();
     }
@@ -468,6 +464,7 @@
         dinamikModAktif = false; btn.classList.add("success-lock");
     }
 
+    // --- GALERİ RENDER & SEÇİM MANTIĞI ---
     function renderGallery() {
         const grid = document.getElementById("galleryGrid");
         const area = document.getElementById("galleryArea");
@@ -496,9 +493,8 @@
 
             let img = document.createElement("img"); img.src = item.directLink;
             
-            div.onclick = (e) => {
-                if(e.ctrlKey || e.metaKey) { toggleSelection(index); } else { openLightbox(index); }
-            };
+            // SMART CLICK HANDLER
+            div.onclick = (e) => { handleGalleryClick(e, index); };
 
             let btn = document.createElement("div"); btn.className = "overlay-copy-btn";
             btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>';
@@ -507,12 +503,42 @@
         });
     }
 
-    function toggleSelection(index) {
-        if(selectedIndices.includes(index)) { selectedIndices = selectedIndices.filter(i => i !== index); } 
-        else { selectedIndices.push(index); }
+    let lastSelectedIndex = -1; // Shift seçimi için son tıklanan
+
+    function handleGalleryClick(e, index) {
+        // 1. Shift + Tık (Aralık Seçimi)
+        if(e.shiftKey && lastSelectedIndex !== -1) {
+            let start = Math.min(lastSelectedIndex, index);
+            let end = Math.max(lastSelectedIndex, index);
+            for(let i=start; i<=end; i++) {
+                if(!selectedIndices.includes(i)) selectedIndices.push(i);
+            }
+        }
+        // 2. Ctrl + Tık (Çoklu/Tekil Seçim/Kaldırma)
+        else if(e.ctrlKey || e.metaKey) {
+            toggleSelection(index);
+            lastSelectedIndex = index;
+        }
+        // 3. Normal Tık (Ama Seçim Modu Açıksa Sticky Davranır)
+        else if(selectedIndices.length > 0) {
+            // Seçim modu açıksa normal tıklama da seçim yapar/kaldırır (Sticky Logic)
+            toggleSelection(index);
+            lastSelectedIndex = index;
+        }
+        // 4. Normal Tık (Seçim Yoksa Lightbox Aç)
+        else {
+            openLightbox(index);
+            lastSelectedIndex = index;
+        }
         renderGallery();
     }
 
+    function toggleSelection(index) {
+        if(selectedIndices.includes(index)) { selectedIndices = selectedIndices.filter(i => i !== index); } 
+        else { selectedIndices.push(index); }
+    }
+
+    // --- CUSTOM CONFIRM ---
     let confirmCallback = null;
     function showConfirm(msg, images, callback) {
         const t = translations[currentLang];
@@ -538,16 +564,30 @@
         document.getElementById("btnConfirmYes").focus();
     }
     
+    // Klavye Yöneticisi (Stack Logic)
     document.addEventListener('keydown', function(e) {
-        if(document.getElementById("lightboxModal").style.display === "block") lightboxKeyHandler(e);
-        else if(document.getElementById("confirmModal").style.display === "block") {
+        // En üstteki modal: Confirm
+        if(document.getElementById("confirmModal").style.display === "block") {
             if(e.key === "Enter") { e.preventDefault(); if(confirmCallback) confirmCallback(); closeConfirm(); }
-            if(e.key === "Escape") closeConfirm();
+            if(e.key === "Escape" || e.key === "Delete") closeConfirm(); // Delete kapatır
+            return; // Diğerlerini engelle
         }
-        else if(document.getElementById("confirmModal").style.display !== "block") {
-            if(e.ctrlKey && e.key === "Delete") { if(history.length > 0) confirmClearGallery(); } 
-            else if(e.key === "Delete") { if(selectedIndices.length > 0) confirmDeleteSelected(); }
+        
+        // İkinci modal: Lightbox
+        if(document.getElementById("lightboxModal").style.display === "block") {
+            lightboxKeyHandler(e);
+            return;
         }
+
+        // Üçüncü modal: Details
+        if(document.getElementById("detailsModal").style.display === "block") {
+            if(e.key === "Escape") closeDetails();
+            return;
+        }
+
+        // Hiçbiri açık değilse (Ana Sayfa Kısayolları)
+        if(e.ctrlKey && e.key === "Delete") { if(history.length > 0) confirmClearGallery(); } 
+        else if(e.key === "Delete") { if(selectedIndices.length > 0) confirmDeleteSelected(); }
     });
 
     document.getElementById("btnConfirmYes").onclick = function() { if(confirmCallback) confirmCallback(); closeConfirm(); };
@@ -586,6 +626,7 @@
         });
     }
 
+    // --- LIGHTBOX ---
     function openLightbox(index, fromSource = 'gallery') {
         activeLightboxIndex = index;
         updateLightboxContent();
