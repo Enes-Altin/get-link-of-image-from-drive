@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Gallery Pro V16</title>
+    <title>Drive Gallery Pro V17</title>
     <style>
         /* --- TEMEL AYARLAR --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
         .container { position: relative; max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .label { font-weight: bold; margin-top: 15px; display: block; margin-bottom: 5px; color: #333; }
 
-        /* --- DİL MENÜSÜ (11 Dil Geri Geldi) --- */
+        /* --- DİL MENÜSÜ --- */
         .lang-wrapper { position: absolute; top: 20px; right: 20px; z-index: 50; }
         .lang-btn {
             background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 5px 10px; cursor: pointer;
@@ -88,7 +88,6 @@
             display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; 
             overflow: auto; backdrop-filter: blur(4px);
         }
-        /* Z-Index Sıralaması: Confirm > Lightbox > Details */
         #detailsModal { z-index: 1000; background-color: rgba(0,0,0,0.6); }
         #lightboxModal { z-index: 2000; background-color: rgba(0,0,0,0.95); }
         #confirmModal { z-index: 3000; background-color: rgba(0,0,0,0.5); }
@@ -98,9 +97,12 @@
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;
         }
-        .lightbox-img { max-width: 90%; max-height: 80vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        .lightbox-img {
+            max-width: 90%; max-height: 80vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: transform 0.2s ease; /* Zoom geçişi için */
+        }
         
-        /* Yan Tuşlar */
+        /* Yan Tuşlar (Orta) */
         .lb-btn {
             position: absolute; background: rgba(255,255,255,0.15); color: white; border: none;
             cursor: pointer; padding: 20px; font-size: 30px; border-radius: 5px; top: 50%; transform: translateY(-50%); 
@@ -113,17 +115,26 @@
         /* Alt Kontrol Barı */
         .lb-bottom-bar {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 10px; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 30px;
+            display: flex; gap: 15px; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.6); padding: 10px 20px; border-radius: 30px;
         }
         
+        /* Grup Stili (Yanyana butonlar için) */
+        .lb-group { display: flex; gap: 2px; }
         .lb-mini-nav {
-            background: rgba(255,255,255,0.2); color: white; border: none; width: 35px; height: 35px; border-radius: 50%;
-            cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s;
+            background: rgba(255,255,255,0.2); color: white; border: none; width: 40px; height: 40px;
+            cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;
         }
         .lb-mini-nav:hover { background: rgba(255,255,255,0.4); }
-        .lb-mini-nav:active { transform: scale(0.9); }
+        .lb-mini-nav:active { background: rgba(255,255,255,0.5); }
+        
+        /* Kenar yuvarlama (Sol/Sağ birleşim için) */
+        .lb-group .lb-mini-nav:first-child { border-radius: 20px 0 0 20px; }
+        .lb-group .lb-mini-nav:last-child { border-radius: 0 20px 20px 0; }
 
+        /* Zoom Tuşları */
+        .lb-zoom-group { display: flex; gap: 2px; margin-right: 10px; }
+        
         .lb-copy {
             background: #fd7e14; color: white; padding: 0 20px; height: 40px; border-radius: 20px; border: none;
             cursor: pointer; font-weight: bold; transition: background 0.2s, transform 0.1s; white-space: nowrap; font-size: 14px;
@@ -156,23 +167,25 @@
         table.link-table th { background-color: #f2f2f2; font-weight: 600; }
         .tbl-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; }
         
-        /* Kayan Link Alanı */
-        .link-scroll-container {
-            display: flex; align-items: center; gap: 10px; width: 100%;
+        /* Kaydırmalı Link Alanı (Scrollbar Gizli) */
+        .link-text-wrapper {
+            display: flex; align-items: center; gap: 8px;
+            border: 1px solid #eee; padding: 5px 8px; border-radius: 4px; overflow: hidden;
         }
         .link-text {
-            overflow-x: auto; white-space: nowrap; padding-bottom: 5px; 
-            font-family: monospace; color: #555; border: 1px solid #eee; padding: 5px; border-radius: 4px; flex: 1;
+            overflow-x: auto; white-space: nowrap; 
+            font-family: monospace; color: #555; flex: 1;
+            /* Scrollbar Gizleme */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
         }
-        .link-text::-webkit-scrollbar { height: 6px; }
-        .link-text::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        .link-text::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
 
         .btn-copy-sm { background: #6c757d; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
         .btn-copy-sm:hover { background: #5c636a; }
         .btn-danger-sm { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .btn-danger-sm:hover { background: #bb2d3b; }
 
-        /* Footer Butonları */
         .btn-footer { padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; border: none; display: flex; align-items: center; gap: 8px; color: white; font-weight: 500; }
         .btn-copy-all { background: #198754; } .btn-copy-all:hover { background: #157347; }
         .btn-excel { background: #217346; } .btn-excel:hover { background: #1a5c38; }
@@ -193,20 +206,26 @@
 <div id="lightboxModal" class="modal" onclick="closeIfBackdrop(event, 'lightboxModal')">
     <span class="close-modal" onclick="closeLightbox()">&times;</span>
     <div class="lightbox-container">
-        <button class="lb-btn lb-prev" id="lbMidPrev" onclick="changeSlide(-1)">&#10094;</button>
+        <button class="lb-btn lb-prev" id="lbMidPrev" onclick="handleNavClick('prev', 'mid')">&#10094;</button>
         <img class="lightbox-img" id="lbImage">
-        <button class="lb-btn lb-next" id="lbMidNext" onclick="changeSlide(1)">&#10095;</button>
+        <button class="lb-btn lb-next" id="lbMidNext" onclick="handleNavClick('next', 'mid')">&#10095;</button>
         
         <div class="lb-bottom-bar">
-            <button class="lb-mini-nav" id="lbBotPrev" onclick="changeSlide(-1)">&#10094;</button>
+            <div class="lb-group lb-zoom-group">
+                <button class="lb-mini-nav" onclick="zoomImage(-0.2)">-</button>
+                <button class="lb-mini-nav" onclick="zoomImage(0.2)">+</button>
+            </div>
+
+            <div class="lb-group">
+                <button class="lb-mini-nav" id="lbBotPrev" onclick="handleNavClick('prev', 'bot')">&#10094;</button>
+                <button class="lb-mini-nav" id="lbBotNext" onclick="handleNavClick('next', 'bot')">&#10095;</button>
+            </div>
             
             <button class="lb-copy" id="lbCopyBtn" onclick="copyFromLightbox()" title="Kısayol: C">Linki Kopyala</button>
             
             <button class="lb-trash" onclick="deleteFromLightbox()" title="Sil (Kısayol: Delete)">
                 <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
             </button>
-
-            <button class="lb-mini-nav" id="lbBotNext" onclick="changeSlide(1)">&#10095;</button>
         </div>
     </div>
 </div>
@@ -221,7 +240,7 @@
             <table class="link-table">
                 <thead>
                     <tr>
-                        <th data-lang="thImage" style="width: 80px;">Resim</th>
+                        <th data-lang="thImage" style="width: 70px;">Resim</th>
                         <th data-lang="thDirect">Direkt Link</th>
                         <th data-lang="thAction" style="width: 80px;">İşlem</th>
                     </tr>
@@ -279,7 +298,7 @@
     
     <label class="label" data-lang="labelInput">Normal Drive Linki:</label>
     <div class="input-group">
-        <input type="text" id="driveLink" placeholder="https://drive.google.com/file/d/...." onclick="this.select()" oninput="dinamikKontrol()">
+        <input type="text" id="driveLink" placeholder="Linkleri buraya yapıştırın (Virgülle ayırabilirsiniz)..." onclick="this.select()" oninput="dinamikKontrol()">
         <button class="paste-btn" id="btnPaste" onclick="yapistir()" title="Panodan Yapıştır">
             <svg viewBox="0 0 24 24"><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 16H5V5h2v1c0 .55.45 1 1 1h8c.55 0 1-.45 1-1V5h2v14z"/></svg>
         </button>
@@ -302,7 +321,13 @@
     let currentLang = 'tr';
     let dinamikModAktif = false; 
     let activeLightboxIndex = 0; 
-    let activeImageIds = []; // Çoklu seçim için dizi
+    let activeImageIds = []; 
+    let currentZoom = 1; // Zoom seviyesi
+    let navPreference = 'mid'; // 'mid' (orta) veya 'bot' (alt) tuş tercihi
+    
+    // Başlangıçta rastgele bir tuş seti seç (kullanıcı dokunana kadar)
+    navPreference = Math.random() > 0.5 ? 'mid' : 'bot';
+
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
     const translations = {
@@ -332,7 +357,6 @@
         if(document.getElementById("detailsModal").style.display === "block") showDetails(); 
     }
 
-    // --- MODAL KAPATMA (BACKDROP TIKLAMA) ---
     function closeIfBackdrop(e, modalId) {
         if(e.target === document.getElementById(modalId)) {
             if(modalId === 'lightboxModal') closeLightbox();
@@ -341,7 +365,6 @@
         }
     }
 
-    // --- LINK DÖNÜŞTÜRME (MULTI-LINK) ---
     function linkDonustur() {
         var btn = document.getElementById("btnConvert");
         if(btn.classList.contains('passive')) return;
@@ -351,25 +374,22 @@
 
         if(rawInput === "") { hataAnimasyonu(t.errEmpty); return; }
 
-        // Virgülle ayır ve işle
         let links = rawInput.split(',').map(s => s.trim()).filter(s => s !== "");
         let hasValidLink = false;
-        activeImageIds = []; // Bu seferlik aktif olanları sıfırla
+        activeImageIds = []; 
 
         links.forEach(val => {
             if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) val = "https://" + val;
             let idMatch = val.match(driveRegex);
-            
             if (idMatch) {
                 hasValidLink = true;
                 let fileID = idMatch[1];
                 let newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
                 
-                // Eskisini sil, yenisini ekle
                 history = history.filter(item => item.id !== fileID);
-                history.push({ id: fileID, directLink: newLink, originalLink: val });
+                // UNSHIFT ile başa ekle (En yeniler en üstte)
+                history.unshift({ id: fileID, directLink: newLink, originalLink: val });
                 
-                // Aktif listesine ekle
                 activeImageIds.push(fileID);
             }
         });
@@ -393,8 +413,6 @@
         }
         history.forEach((item, index) => {
             let div = document.createElement("div"); div.className = "gallery-item";
-            
-            // Eğer bu resim son eklenenler arasındaysa yeşil çerçeve
             if(activeImageIds.includes(item.id)) div.classList.add("active-item");
             
             let img = document.createElement("img"); img.src = item.directLink; img.onclick = () => openLightbox(index);
@@ -406,7 +424,6 @@
         if(document.getElementById("detailsModal").style.display === "block") { showDetails(); }
     }
 
-    // --- CUSTOM ONAY MODALI ---
     let confirmCallback = null;
     function showConfirm(msg, imgSrc, callback) {
         const t = translations[currentLang];
@@ -422,7 +439,6 @@
         } else {
             imgEl.style.display = "none";
         }
-        
         confirmCallback = callback;
         document.getElementById("confirmModal").style.display = "block";
     }
@@ -433,7 +449,6 @@
     };
     function closeConfirm() { document.getElementById("confirmModal").style.display = "none"; confirmCallback = null; }
 
-    // --- SİLME İŞLEMLERİ (CUSTOM CONFIRM İLE) ---
     function confirmClearGallery() {
         const t = translations[currentLang];
         showConfirm(t.confirmDelAll, null, function() {
@@ -446,8 +461,9 @@
 
     function deleteFromLightbox() {
         const t = translations[currentLang];
-        // Tam ekranda resim göstermeye gerek yok, zaten arkada var
-        showConfirm(t.confirmDelOne, null, function() {
+        let currentImg = history[activeLightboxIndex].directLink;
+        // Tam ekranda da küçük resmi göster
+        showConfirm(t.confirmDelOne, currentImg, function() {
             let deletedId = history[activeLightboxIndex].id;
             history.splice(activeLightboxIndex, 1);
             activeImageIds = activeImageIds.filter(id => id !== deletedId);
@@ -459,7 +475,6 @@
         });
     }
 
-    // --- LIGHTBOX ---
     function openLightbox(index) {
         activeLightboxIndex = index;
         updateLightboxContent();
@@ -474,32 +489,61 @@
         if (history.length === 0) { closeLightbox(); return; }
         if (activeLightboxIndex >= history.length) activeLightboxIndex = 0;
         let item = history[activeLightboxIndex];
-        document.getElementById("lbImage").src = item.directLink;
+        let img = document.getElementById("lbImage");
+        img.src = item.directLink;
+        
+        // Zoom Reset
+        currentZoom = 1;
+        img.style.transform = `scale(${currentZoom})`;
+
         const t = translations[currentLang];
         let btn = document.getElementById("lbCopyBtn");
         btn.innerText = t.btnCopy; btn.style.backgroundColor = "#fd7e14";
     }
-    function changeSlide(direction, btnId) {
+
+    // Yön Tuşu İşleyici (Hem Tıklama Hem Klavye)
+    function handleNavClick(directionStr, type) {
+        // Tercihi güncelle
+        navPreference = type;
+        
+        let dir = directionStr === 'next' ? 1 : -1;
+        changeSlide(dir);
+    }
+
+    function changeSlide(direction) {
         if(history.length === 0) return;
         activeLightboxIndex += direction;
         if (activeLightboxIndex >= history.length) activeLightboxIndex = 0;
         if (activeLightboxIndex < 0) activeLightboxIndex = history.length - 1;
         updateLightboxContent();
-        
-        // Animasyon Tetikleme (Eğer bir buton ID'si verilmişse)
-        if(btnId) {
+    }
+
+    function zoomImage(amount) {
+        currentZoom += amount;
+        if (currentZoom < 0.5) currentZoom = 0.5;
+        if (currentZoom > 3) currentZoom = 3;
+        document.getElementById("lbImage").style.transform = `scale(${currentZoom})`;
+    }
+
+    function lightboxKeyHandler(e) {
+        // Tercihe göre animasyon yap
+        if (e.key === "ArrowRight") {
+            changeSlide(1);
+            let btnId = (navPreference === 'mid') ? 'lbMidNext' : 'lbBotNext';
             let btn = document.getElementById(btnId);
             if(btn) { btn.classList.add("key-active"); setTimeout(() => btn.classList.remove("key-active"), 150); }
         }
-    }
-    function lightboxKeyHandler(e) {
-        // Klavye ile sadece ORTA tuşları (lbMidPrev/Next) animasyon yap
-        if (e.key === "ArrowRight") changeSlide(1, "lbMidNext");
-        if (e.key === "ArrowLeft") changeSlide(-1, "lbMidPrev");
+        if (e.key === "ArrowLeft") {
+            changeSlide(-1);
+            let btnId = (navPreference === 'mid') ? 'lbMidPrev' : 'lbBotPrev';
+            let btn = document.getElementById(btnId);
+            if(btn) { btn.classList.add("key-active"); setTimeout(() => btn.classList.remove("key-active"), 150); }
+        }
         if (e.key === "Escape") closeLightbox();
         if (e.key.toLowerCase() === "c") copyFromLightbox();
         if (e.key === "Delete" || e.key === "Backspace") deleteFromLightbox();
     }
+
     function copyFromLightbox() {
         let link = history[activeLightboxIndex].directLink;
         let btn = document.getElementById("lbCopyBtn");
@@ -510,7 +554,6 @@
         });
     }
 
-    // --- DETAYLAR & EXCEL ---
     function showDetails() {
         const tbody = document.getElementById("detailsTableBody");
         const t = translations[currentLang];
@@ -518,16 +561,14 @@
         history.forEach((item, index) => {
             let row = document.createElement("tr");
             
-            // Resim
             let cellImg = document.createElement("td");
             let img = document.createElement("img");
             img.src = item.directLink; img.className = "tbl-thumb";
             img.onclick = () => { openLightbox(index); };
             cellImg.appendChild(img);
 
-            // Kaydırmalı Link + Buton
             let cellLink = document.createElement("td");
-            let divWrap = document.createElement("div"); divWrap.className = "link-scroll-container";
+            let divWrap = document.createElement("div"); divWrap.className = "link-text-wrapper";
             let spanLink = document.createElement("div"); spanLink.className = "link-text"; spanLink.innerText = item.directLink;
             let btnCopy = document.createElement("button"); btnCopy.className = "btn-copy-sm"; btnCopy.innerText = t.btnCopy;
             btnCopy.onclick = () => {
@@ -539,7 +580,6 @@
             divWrap.appendChild(spanLink); divWrap.appendChild(btnCopy);
             cellLink.appendChild(divWrap);
 
-            // Silme (Resimli Onay)
             let cellAct = document.createElement("td");
             let btnDel = document.createElement("button"); btnDel.className = "btn-danger-sm"; btnDel.innerText = t.btnDelete;
             btnDel.onclick = () => {
@@ -548,7 +588,7 @@
                     history.splice(index, 1);
                     activeImageIds = activeImageIds.filter(id => id !== deletedId);
                     renderGallery(); 
-                    if(history.length === 0) closeDetails();
+                    if(history.length === 0) closeDetails(); else showDetails();
                 });
             };
             cellAct.appendChild(btnDel);
@@ -566,20 +606,37 @@
             let btn = document.querySelector(".btn-copy-all span");
             let oldText = btn.innerText;
             btn.innerText = t.msgCopied;
-            setTimeout(() => { btn.innerText = t.btnCopyAll; }, 1500);
+            setTimeout(() => { btn.innerText = t.btnCopyAll || "Tümünü Kopyala"; }, 1500);
         });
     }
 
+    // HTML TABLOYU EXCEL OLARAK İNDİRME (RESİM DESTEKLİ)
     function exportToExcel() {
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Image ID,Direct Link,Original Link\n";
+        let tableHTML = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head></head>
+            <body>
+            <table border="1">
+                <thead><tr><th>Image</th><th>Direct Link</th><th>Original Link</th></tr></thead>
+                <tbody>
+        `;
+        
         history.forEach(item => {
-            csvContent += `${item.id},${item.directLink},${item.originalLink}\n`;
+            tableHTML += `
+                <tr height="100">
+                    <td align="center" valign="middle"><img src="${item.directLink}" width="100" height="100"></td>
+                    <td><a href="${item.directLink}">${item.directLink}</a></td>
+                    <td><a href="${item.originalLink}">${item.originalLink}</a></td>
+                </tr>
+            `;
         });
-        var encodedUri = encodeURI(csvContent);
-        var link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "drive_gallery_links.csv");
+        
+        tableHTML += `</tbody></table></body></html>`;
+
+        let blob = new Blob([tableHTML], { type: 'application/vnd.ms-excel' });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "drive_gallery_visual.xls";
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -602,7 +659,6 @@
         var btn = document.getElementById("btnConvert");
         const t = translations[currentLang];
         if (val === "") { btn.classList.add("passive"); btn.innerText = t.errEmpty; return; }
-        // Basit regex kontrolü, asıl ayıklama butona basınca
         if (!val.match(driveRegex)) { btn.classList.add("passive"); btn.innerText = t.errInvalid; } 
         else { btn.classList.remove("passive"); btn.innerText = t.btnConvert; }
     }
