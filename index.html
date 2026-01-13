@@ -41,22 +41,6 @@
         .paste-btn:hover { background-color: #5c636a; }
         .paste-btn svg { width: 22px; height: 22px; fill: white; }
 
-        /* --- SETTINGS BAR (SWITCH) --- */
-        .settings-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; margin-right: 8px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #ccc; transition: .4s; border-radius: 20px;
-        }
-        .slider:before {
-            position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
-            background-color: white; transition: .4s; border-radius: 50%;
-        }
-        input:checked + .slider { background-color: #2196F3; }
-        input:checked + .slider:before { transform: translateX(20px); }
-        .switch-label { font-size: 13px; color: #555; cursor: pointer; user-select: none; }
-
         .convert-btn { 
             background-color: #0d6efd; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; 
             font-size: 15px; margin-bottom: 5px; font-weight: bold; transition: background-color 0.3s, transform 0.2s;
@@ -103,7 +87,6 @@
             transition: background-color 0.3s;
         }
         .card-copy-btn:hover { background-color: #e36906; }
-        .reset-btn-container { text-align: right; margin-top: 10px; }
 
         /* --- GALERİ GRID --- */
         #galleryArea { margin-top: 20px; display: none; }
@@ -375,14 +358,6 @@
         </button>
     </div>
     
-    <div class="settings-bar">
-        <label class="switch">
-            <input type="checkbox" id="historySwitch" checked onchange="toggleHistoryMode()">
-            <span class="slider"></span>
-        </label>
-        <span class="switch-label" onclick="document.getElementById('historySwitch').click()" data-lang="lblHistory">Resimleri Biriktir</span>
-    </div>
-
     <button id="btnConvert" class="convert-btn" onclick="linkDonustur()" data-lang="btnConvert">Dönüştür</button>
 
     <div id="infoTip">
@@ -414,7 +389,6 @@
     let selectedIndices = []; 
     let currentZoom = 1; 
     let navPreference = 'mid'; 
-    let isHistoryEnabled = true; 
     let previousHistoryCount = 0;
     let isTipClosed = false; 
     navPreference = Math.random() > 0.5 ? 'mid' : 'bot';
@@ -422,9 +396,18 @@
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
     const translations = {
-        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "Linkleri buraya yapıştırın (Virgülle ayırabilirsiniz)...", btnConvert: "Dönüştür", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", btnReset: "Sıfırla", btnDeleteSelected: "Seçilenleri Sil", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tümünü Kopyala", btnExcel: "Excel İndir", confirmTitle: "Silme Onayı", confirmDelAll: "Tüm galeri silinecek. Emin misiniz?", confirmDelOne: "Bu resmi silmek istediğinize emin misiniz?", confirmDelSel: "Seçilen resimleri silmek istediğinize emin misiniz?", btnYes: "Evet, Sil", btnNo: "İptal", pasteTooltip: "Panodan Yapıştır", lblHistory: "Resimleri Biriktir", galleryTitleAll: "Tüm Resimler:", galleryTitleMulti: "Çoklu Resimler:", infoText: "Direkt resim urllerini kopyalamak istediğiniz resimlerin üzerindeki url simgesini tıklayınız" },
-        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste links here (comma separated)...", btnConvert: "Convert", btnDetails: "Detailed List", btnClear: "Clear All", btnReset: "Reset", btnDeleteSelected: "Delete Selected", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All", btnExcel: "Download Excel", confirmTitle: "Delete Confirmation", confirmDelAll: "All gallery will be deleted. Are you sure?", confirmDelOne: "Are you sure you want to delete this image?", confirmDelSel: "Are you sure you want to delete selected images?", btnYes: "Yes, Delete", btnNo: "Cancel", pasteTooltip: "Paste from Clipboard", lblHistory: "Accumulate Images", galleryTitleAll: "All Images:", galleryTitleMulti: "Multiple Images:", infoText: "Click the url icon on the images to copy direct image urls" },
-        // ... (Diğer diller için de infoText ve yeni başlıklar eklenebilir, şimdilik TR/EN yeterli) ...
+        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "Linkleri buraya yapıştırın (Virgülle ayırabilirsiniz)...", btnConvert: "Dönüştür", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", btnDeleteSelected: "Seçilenleri Sil", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tümünü Kopyala", btnExcel: "Excel İndir", confirmTitle: "Silme Onayı", confirmDelAll: "Tüm galeri silinecek. Emin misiniz?", confirmDelOne: "Bu resmi silmek istediğinize emin misiniz?", confirmDelSel: "Seçilen resimleri silmek istediğinize emin misiniz?", btnYes: "Evet, Sil", btnNo: "İptal", pasteTooltip: "Panodan Yapıştır", galleryTitleAll: "Tüm Resimler:", infoText: "Direkt resim urllerini kopyalamak istediğiniz resimlerin üzerindeki url simgesini tıklayınız" },
+        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste links here (comma separated)...", btnConvert: "Convert", btnDetails: "Detailed List", btnClear: "Clear All", btnDeleteSelected: "Delete Selected", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All", btnExcel: "Download Excel", confirmTitle: "Delete Confirmation", confirmDelAll: "All gallery will be deleted. Are you sure?", confirmDelOne: "Are you sure you want to delete this image?", confirmDelSel: "Are you sure you want to delete selected images?", btnYes: "Yes, Delete", btnNo: "Cancel", pasteTooltip: "Paste from Clipboard", galleryTitleAll: "All Images:", infoText: "Click the url icon on the images to copy direct image urls" },
+        // ... (Diğer diller önceki koddan alınabilir) ...
+        de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Links hier einfügen...", btnConvert: "Umwandeln", btnDetails: "Detaillierte Liste", btnClear: "Alles löschen", btnDeleteSelected: "Ausgewählte löschen", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", btnCopy: "Kopieren", modalTitle: "Generierte Links", thImage: "Bild", thDirect: "Direktlink", thAction: "Aktion", btnDelete: "Löschen", btnCopyAll: "Alles Kopieren", btnExcel: "Excel Herunterladen", confirmTitle: "Löschbestätigung", confirmDelAll: "Die gesamte Galerie wird gelöscht. Sind Sie sicher?", confirmDelOne: "Möchten Sie dieses Bild wirklich löschen?", confirmDelSel: "Möchten Sie die ausgewählten Bilder löschen?", btnYes: "Ja, Löschen", btnNo: "Abbrechen", pasteTooltip: "Aus Zwischenablage einfügen", galleryTitleAll: "Alle Bilder:", infoText: "Klicken Sie auf das URL-Symbol auf den Bildern, um direkte Bild-URLs zu kopieren" },
+        fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez les liens ici...", btnConvert: "Convertir", btnDetails: "Liste détaillée", btnClear: "Tout effacer", btnDeleteSelected: "Supprimer la sélection", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", btnCopy: "Copier", modalTitle: "Liens générés", thImage: "Image", thDirect: "Lien direct", thAction: "Action", btnDelete: "Supprimer", btnCopyAll: "Tout Copier", btnExcel: "Télécharger Excel", confirmTitle: "Confirmation de suppression", confirmDelAll: "Toute la galerie sera supprimée. Êtes-vous sûr ?", confirmDelOne: "Êtes-vous sûr de vouloir supprimer cette image ?", confirmDelSel: "Êtes-vous sûr de vouloir supprimer les images sélectionnées ?", btnYes: "Oui, Supprimer", btnNo: "Annuler", pasteTooltip: "Coller depuis le presse-papiers", galleryTitleAll: "Toutes les images :", infoText: "Cliquez sur l'icône url sur les images pour copier les urls directes des images" },
+        es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega los enlaces aquí...", btnConvert: "Convertir", btnDetails: "Lista Detallada", btnClear: "Borrar Todo", btnDeleteSelected: "Eliminar Seleccionados", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", btnCopy: "Copiar", modalTitle: "Enlaces Generados", thImage: "Imagen", thDirect: "Enlace Directo", thAction: "Acción", btnDelete: "Eliminar", btnCopyAll: "Copiar Todo", btnExcel: "Descargar Excel", confirmTitle: "Confirmación de eliminación", confirmDelAll: "¿Se eliminará toda la galería. Estás seguro?", confirmDelOne: "¿Estás seguro de que quieres eliminar esta imagen?", confirmDelSel: "¿Estás seguro de que quieres eliminar las imágenes seleccionadas?", btnYes: "Sí, Eliminar", btnNo: "Cancelar", pasteTooltip: "Pegar desde portapapeles", galleryTitleAll: "Todas las imágenes:", infoText: "Haga clic en el icono de url en las imágenes para copiar las urls directas de las imágenes" },
+        zh: { title: "Google Drive 直接链接生成器", labelInput: "原始 Drive 链接：", placeholder: "在此处粘贴链接...", btnConvert: "转换", btnDetails: "详细列表", btnClear: "全部清除", btnDeleteSelected: "删除所选", errEmpty: "未输入链接！", errInvalid: "无效链接！", msgCopied: "已复制！", btnCopy: "复制", modalTitle: "生成的链接", thImage: "图片", thDirect: "直接链接", thAction: "操作", btnDelete: "删除", btnCopyAll: "复制全部", btnExcel: "下载 Excel", confirmTitle: "删除确认", confirmDelAll: "所有图库都将被删除。你确定吗？", confirmDelOne: "您确定要删除此图片吗？", confirmDelSel: "您确定要删除所选图片吗？", btnYes: "是，删除", btnNo: "取消", pasteTooltip: "从剪贴板粘贴", galleryTitleAll: "所有图像：", infoText: "点击图片上的 url 图标以复制直接图片 url" },
+        ru: { title: "Генератор прямых ссылок Drive", labelInput: "Исходная ссылка:", placeholder: "Вставьте ссылки сюда...", btnConvert: "Конвертировать", btnDetails: "Подробный список", btnClear: "Очистить все", btnDeleteSelected: "Удалить выбранные", errEmpty: "Ссылка не введена!", errInvalid: "Неверная ссылка!", msgCopied: "Скопировано!", btnCopy: "Копировать", modalTitle: "Созданные ссылки", thImage: "Изображение", thDirect: "Прямая ссылка", thAction: "Действие", btnDelete: "Удалить", btnCopyAll: "Копировать все", btnExcel: "Скачать Excel", confirmTitle: "Подтверждение удаления", confirmDelAll: "Вся галерея будет удалена. Вы уверены?", confirmDelOne: "Вы уверены, что хотите удалить это изображение?", confirmDelSel: "Вы уверены, что хотите удалить выбранные изображения?", btnYes: "Да, удалить", btnNo: "Отмена", pasteTooltip: "Вставить из буфера", galleryTitleAll: "Все изображения:", infoText: "Нажмите на значок url на изображениях, чтобы скопировать прямые url изображений" },
+        ar: { title: "محول روابط جوجل درايف", labelInput: "رابط درايف الأصلي:", placeholder: "الصق الروابط هنا...", btnConvert: "تحويل", btnDetails: "قائمة مفصلة", btnClear: "مسح الكل", btnDeleteSelected: "حذف المختار", errEmpty: "لم يتم إدخال رابط!", errInvalid: "رابط غير صالح!", msgCopied: "تم النسخ!", btnCopy: "نسخ", modalTitle: "الروابط التي تم إنشاؤها", thImage: "صورة", thDirect: "رابط مباشر", thAction: "عمل", btnDelete: "حذف", btnCopyAll: "نسخ الكل", btnExcel: "تحميل إكسل", confirmTitle: "تأكيد الحذف", confirmDelAll: "سيتم حذف كل المعرض. هل أنت متأكد؟", confirmDelOne: "هل أنت متأكد أنك تريد حذف هذه الصورة؟", confirmDelSel: "هل أنت متأكد أنك تريد حذف الصور المحددة؟", btnYes: "نعم، حذف", btnNo: "إلغاء", pasteTooltip: "لصق من الحافظة", galleryTitleAll: "كل الصور:", infoText: "انقر فوق رمز url على الصور لنسخ عناوين url المباشرة للصور" },
+        hi: { title: "Google Drive डायरेक्ट लिंक जेनरेटर", labelInput: "मूल ड्राइव लिंक:", placeholder: "लिंक यहाँ पेस्ट करें...", btnConvert: "बदलें", btnDetails: "विस्तृत सूची", btnClear: "सभी साफ करें", btnDeleteSelected: "चयनित हटाएं", errEmpty: "लिंक दर्ज नहीं किया गया!", errInvalid: "अमान्य लिंक!", msgCopied: "कॉपी हो गया!", btnCopy: "कॉपी", modalTitle: "उत्पन्न लिंक", thImage: "छवि", thDirect: "डायरेक्ट लिंक", thAction: "कार्रवाई", btnDelete: "हटाएं", btnCopyAll: "सभी कॉपी करें", btnExcel: "एक्सेल डाउनलोड करें", confirmTitle: "हटाने की पुष्टि", confirmDelAll: "पूरी गैलरी हटा दी जाएगी। क्या आपको यकीन है?", confirmDelOne: "क्या आप वाकई इस छवि को हटाना चाहते हैं?", confirmDelSel: "क्या आप वाकई चयनित छवियों को हटाना चाहते हैं?", btnYes: "हाँ, हटाएं", btnNo: "रद्द करें", pasteTooltip: "क्लिपबोर्ड से चिपकाएं", galleryTitleAll: "सभी चित्र:", infoText: "प्रत्यक्ष छवि url कॉपी करने के लिए छवियों पर url आइकन पर क्लिक करें" },
+        pt: { title: "Gerador de Links Diretos Drive", labelInput: "Link Original:", placeholder: "Cole os links aqui...", btnConvert: "Converter", btnDetails: "Lista Detalhada", btnClear: "Limpar Tudo", btnDeleteSelected: "Excluir Selecionados", errEmpty: "Nenhum link inserido!", errInvalid: "Link Inválido!", msgCopied: "Copiado!", btnCopy: "Copiar", modalTitle: "Links Gerados", thImage: "Imagem", thDirect: "Link Direto", thAction: "Ação", btnDelete: "Excluir", btnCopyAll: "Copiar Tudo", btnExcel: "Baixar Excel", confirmTitle: "Confirmação de Exclusão", confirmDelAll: "Toda a galeria será excluída. Tem certeza?", confirmDelOne: "Tem certeza de que deseja excluir esta imagem?", confirmDelSel: "Tem certeza de que deseja excluir as imagens selecionadas?", btnYes: "Sim, Excluir", btnNo: "Cancelar", pasteTooltip: "Colar da área de transferência", galleryTitleAll: "Todas as imagens:", infoText: "Clique no ícone de url nas imagens para copiar os urls diretos das imagens" },
+        ja: { title: "Google Drive 直リンク作成ツール", labelInput: "元のリンク:", placeholder: "ここにリンクを貼り付け...", btnConvert: "変換", btnDetails: "詳細リスト", btnClear: "すべてクリア", btnDeleteSelected: "選択項目を削除", errEmpty: "リンク未入力！", errInvalid: "無効なリンクです!", msgCopied: "コピーしました!", btnCopy: "コピー", modalTitle: "生成されたリンク", thImage: "画像", thDirect: "直リンク", thAction: "操作", btnDelete: "削除", btnCopyAll: "すべてコピー", btnExcel: "Excelをダウンロード", confirmTitle: "削除の確認", confirmDelAll: "すべてのギャラリーが削除されます。よろしいですか？", confirmDelOne: "この画像を削除してもよろしいですか？", confirmDelSel: "選択した画像を削除してもよろしいですか？", btnYes: "はい、削除", btnNo: "キャンセル", pasteTooltip: "クリップボードから貼り付け", galleryTitleAll: "すべての画像:", infoText: "画像のurlアイコンをクリックして、直リンクをコピーします" }
     };
 
     // --- GLOBAL TIKLAMA ---
@@ -439,8 +422,6 @@
         if(l.style.display === "block" && !l.contains(e.target) && !b.contains(e.target)) {
             l.style.display = "none";
         }
-        
-        // Sticky Selection İptali
         if(selectedIndices.length > 0) {
             if(!e.target.closest('.gallery-item') && !e.target.closest('#btnDelSel')) {
                 selectedIndices = []; updateUI(); 
@@ -450,27 +431,6 @@
 
     function toggleLangMenu(e) { e.stopPropagation(); var l = document.getElementById("langList"); l.style.display = (l.style.display === "block") ? "none" : "block"; }
     function selectLang(c) { currentLang = c; document.getElementById("langList").style.display = "none"; applyTranslations(); }
-
-    function toggleHistoryMode() {
-        isHistoryEnabled = document.getElementById("historySwitch").checked;
-        
-        // EĞER KAPATILDIYSA: ANINDA AKSİYON
-        if (!isHistoryEnabled) {
-            // Sadece son eklenenleri tut
-            if(lastAddedIds.length > 0) {
-                history = history.filter(item => lastAddedIds.includes(item.id));
-            } else {
-                // Eğer hiç "son eklenen" yoksa ama liste doluysa, son eklenen olarak hiçbir şey işaretli değil demektir.
-                // Kullanıcı temizlemek istiyor gibi davranalım veya son işlemi baz alalım.
-                // Güvenli yöntem: Eğer lastAddedIds boşsa her şeyi siler.
-                // Ancak "son dönüştürülenleri" tutmak istiyoruz. lastAddedIds sadece dönüştürme anında doluyor.
-                // Eğer sayfa yenilenmediyse lastAddedIds duruyordur.
-            }
-            previousHistoryCount = 0; // State sıfırla
-            updateUI(); 
-        }
-        // EĞER AÇILDIYSA: BEKLE (linkDonustur fonksiyonunda işlenecek)
-    }
 
     function applyTranslations() {
         const t = translations[currentLang];
@@ -513,13 +473,7 @@
         let links = rawInput.split(',').map(s => s.trim()).filter(s => s !== "");
         let hasValidLink = false;
         
-        previousHistoryCount = isHistoryEnabled ? history.length : 0;
-        
-        if(!isHistoryEnabled) {
-            history = [];
-            selectedIndices = [];
-        }
-
+        previousHistoryCount = history.length; // Daima geçmişi al (Hep biriktiriyor)
         lastAddedIds = []; 
 
         links.forEach(val => {
@@ -537,7 +491,7 @@
 
         if (!hasValidLink) { hataAnimasyonu(t.errInvalid); return; }
         
-        // İşlem yapıldığı için uyarısı kapat
+        // İşlem yapıldığı için uyarıyı kapat
         closeInfoTip();
         
         updateUI();
@@ -564,25 +518,12 @@
             return;
         }
 
-        // --- MANTIK ŞEMASI (HYBRID MODE LOGIC) ---
-        let showCards = false;
-        let newItemsCount = lastAddedIds.length;
+        // --- YENİ HİBRİT MANTIK (DAHA BASİT) ---
+        // Kart Modu: Eğer toplam resim <= 3 VE önceden boşsa (Fresh Start)
+        let showCards = (history.length <= 3 && previousHistoryCount === 0);
 
-        // 1. Durum: Tarihçe BOŞTU veya KAPALI (Temiz Başlangıç)
-        if (!isHistoryEnabled || previousHistoryCount === 0) {
-            if (history.length <= 3) showCards = true;
-        } 
-        // 2. Durum: Tarihçe DOLUYDU ve AÇIK (Ekleme Modu)
-        else {
-            // Var olanın üzerine ekleme yapıldı.
-            // "1 yeni resim bile eklense ızgara görünümüne geçilir" (User Req)
-            // Dolayısıyla buraya giriyorsak showCards hep FALSE kalmalı.
-            showCards = false; 
-        }
-
-        // Başlık Ayarı
-        if (isHistoryEnabled) galleryLabel.innerText = t.galleryTitleAll;
-        else galleryLabel.innerText = t.galleryTitleMulti;
+        // Başlık: Her zaman "Tüm Resimler"
+        galleryLabel.innerText = t.galleryTitleAll;
 
         if (showCards) {
             cardsArea.style.display = "block";
@@ -591,7 +532,7 @@
 
             history.forEach((item, index) => {
                 let card = document.createElement("div"); card.className = "result-card";
-                let titleText = history.length > 1 ? (index + 1) + ". " + t.thImage : t.modalTitle.split(" ")[0]; // "Oluşturulan" vs
+                let titleText = history.length > 1 ? (index + 1) + ". " + t.thImage : t.modalTitle.split(" ")[0]; 
                 if (history.length === 1) titleText = "Direkt Resim Linki";
 
                 let img = document.createElement("img"); img.src = item.directLink; img.className = "card-thumb";
@@ -617,16 +558,14 @@
                 cardsArea.appendChild(card);
             });
 
-            // SIFIRLA BUTONU (Kart Modunda)
-            if(!isHistoryEnabled || previousHistoryCount === 0) {
-                let resetDiv = document.createElement("div"); resetDiv.className = "reset-btn-container";
-                let resetBtn = document.createElement("button"); 
-                resetBtn.className = "btn-outline-danger"; 
-                resetBtn.innerText = t.btnReset; 
-                resetBtn.onclick = confirmClearGallery;
-                resetDiv.appendChild(resetBtn);
-                cardsArea.appendChild(resetDiv);
-            }
+            // Kart Modunda da bir temizleme butonu
+            let resetDiv = document.createElement("div"); resetDiv.className = "reset-btn-container";
+            let resetBtn = document.createElement("button"); 
+            resetBtn.className = "btn-outline-danger"; 
+            resetBtn.innerText = t.btnClear;
+            resetBtn.onclick = confirmClearGallery;
+            resetDiv.appendChild(resetBtn);
+            cardsArea.appendChild(resetDiv);
 
         } else {
             // GRID MODU
@@ -634,11 +573,9 @@
             galleryArea.style.display = "block";
             batchControls.style.display = "flex";
 
-            // Info Tip Gösterimi (Eğer kapatılmadıysa)
             if (!isTipClosed) infoTip.style.display = "block"; else infoTip.style.display = "none";
 
-            if (!isHistoryEnabled) btnClearAll.innerText = t.btnReset;
-            else btnClearAll.innerText = t.btnClear;
+            btnClearAll.innerText = t.btnClear;
 
             if(selectedIndices.length > 0) {
                 btnDelSel.style.display = "block";
@@ -653,7 +590,6 @@
                 // FLASH HIGHLIGHT (Sadece Grid modunda ve yeni eklenenlerde)
                 if (lastAddedIds.includes(item.id)) {
                     div.classList.add("temp-highlight");
-                    // Animasyon bitince class'ı sil (Tekrar tetiklenmemesi için opsiyonel ama temizlik iyidir)
                     setTimeout(() => div.classList.remove("temp-highlight"), 2500);
                 }
                 
@@ -724,7 +660,7 @@
         showConfirm(t.confirmDelAll, allImgs, function() {
             history = []; lastAddedIds = []; selectedIndices = [];
             previousHistoryCount = 0; 
-            closeInfoTip(); // Temizleyince uyarıyı da kapat (User req)
+            closeInfoTip(); 
             updateUI();
             document.getElementById("driveLink").value = "";
             document.getElementById("btnConvert").classList.remove("success-lock");
