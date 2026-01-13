@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Gallery Manager Pro</title>
+    <title>Drive Gallery Manager Pro V15</title>
     <style>
         /* --- TEMEL AYARLAR --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
@@ -73,8 +73,17 @@
         .gallery-item:hover { transform: scale(1.02); }
         .gallery-item img {
             width: 100%; height: 100%; object-fit: cover; display: block;
+            transition: filter 0.2s;
         }
         
+        /* Thumbnail Flash Animasyonu */
+        @keyframes flashEffect {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.8) sepia(0.5) hue-rotate(90deg); } /* Parlama efekti */
+            100% { filter: brightness(1); }
+        }
+        .flash-anim { animation: flashEffect 0.4s ease-out; }
+
         .gallery-item.active-item {
             border: 3px solid #198754;
             box-shadow: 0 0 10px rgba(25, 135, 84, 0.3);
@@ -117,9 +126,7 @@
             display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; 
             overflow: auto; backdrop-filter: blur(4px);
         }
-        /* Detaylar Modalı için Z-Index */
         #detailsModal { z-index: 1000; background-color: rgba(0,0,0,0.6); }
-        /* Lightbox Modalı için Z-Index (Daha yüksek olmalı ki üstte çıksın) */
         #lightboxModal { z-index: 2000; background-color: rgba(0,0,0,0.95); }
         
         .lightbox-container {
@@ -130,7 +137,6 @@
             max-width: 90%; max-height: 85vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5);
         }
         
-        /* NAVIGASYON BUTONLARI (DÜZELTİLDİ) */
         .lb-btn {
             position: absolute; 
             background: rgba(255,255,255,0.15); 
@@ -140,33 +146,26 @@
             font-size: 30px; 
             border-radius: 5px; 
             top: 50%; 
-            /* Y ekseninde %50 yukarı alarak tam ortala */
             transform: translateY(-50%); 
             transition: background 0.2s, transform 0.1s;
-            /* Seçimi engelle ki hızlı tıklayınca bozulmasın */
             user-select: none; 
             -webkit-user-select: none;
         }
         .lb-btn:hover { background: rgba(255,255,255,0.4); }
-        /* Active durumunda Y eksenini sabit tut, sadece scale et (Zıplamayı önler) */
-        .lb-btn:active { transform: translateY(-50%) scale(0.9); }
+        /* JS ile eklenecek "basılma" sınıfı */
+        .lb-btn.key-active, .lb-btn:active { transform: translateY(-50%) scale(0.9); background: rgba(255,255,255,0.6); }
         
         .lb-prev { left: 20px; }
         .lb-next { right: 20px; }
         
-        /* Kopyala Butonu */
-        .lb-copy {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: #fd7e14; color: white; padding: 10px 25px; border-radius: 20px; border: none;
-            cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            transition: background 0.2s, transform 0.1s;
+        /* Alt Kontrol Grubu (Kopyala ve Sil) */
+        .lb-controls {
+            position: absolute; bottom: 30px; right: 30px;
+            display: flex; gap: 10px; align-items: center;
         }
-        .lb-copy:hover { background: #e36906; }
-        .lb-copy:active { transform: translateX(-50%) scale(0.95); }
 
         /* Sil Butonu (Lightbox) */
         .lb-trash {
-            position: absolute; bottom: 30px; right: 30px;
             background: rgba(220, 53, 69, 0.8); color: white;
             width: 45px; height: 45px; border-radius: 50%; border: none;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -175,6 +174,17 @@
         .lb-trash:hover { background: #dc3545; }
         .lb-trash:active { transform: scale(0.9); }
         .lb-trash svg { width: 20px; height: 20px; fill: white; }
+
+        /* Kopyala Butonu (Lightbox - Silmenin Solunda) */
+        .lb-copy {
+            background: #fd7e14; color: white; padding: 0 20px; height: 45px; border-radius: 25px; border: none;
+            cursor: pointer; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            transition: background 0.2s, transform 0.1s;
+            display: flex; align-items: center; justify-content: center;
+            white-space: nowrap;
+        }
+        .lb-copy:hover { background: #e36906; }
+        .lb-copy:active { transform: scale(0.95); }
 
         .close-modal {
             position: absolute; top: 20px; right: 30px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 2002;
@@ -185,9 +195,9 @@
             background-color: #fefefe; margin: 5% auto; padding: 20px; border: 1px solid #888;
             width: 80%; max-width: 800px; border-radius: 8px; position: relative; max-height: 90vh; overflow-y: auto;
         }
-        .details-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .details-header { display: flex; align-items: center; margin-bottom: 10px; position: relative; }
         .close-details {
-            position: absolute; top: 15px; right: 20px; color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;
+            position: absolute; top: -5px; right: 0; color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer;
         }
         .close-details:hover { color: black; }
         
@@ -204,6 +214,8 @@
         
         .btn-copy-all {
             background: #198754; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px;
+            margin-left: 20px; /* Başlık ile arası */
+            margin-right: 40px; /* Çarpı ile arası */
         }
         .btn-copy-all:hover { background: #157347; }
 
@@ -211,30 +223,31 @@
 </head>
 <body>
 
-<div id="lightboxModal" class="modal">
+<div id="lightboxModal" class="modal" onclick="closeIfBackdrop(event, 'lightboxModal')">
     <span class="close-modal" onclick="closeLightbox()">&times;</span>
     <div class="lightbox-container">
         <button class="lb-btn lb-prev" onclick="changeSlide(-1)">&#10094;</button>
         <img class="lightbox-img" id="lbImage">
         <button class="lb-btn lb-next" onclick="changeSlide(1)">&#10095;</button>
         
-        <button class="lb-copy" id="lbCopyBtn" onclick="copyFromLightbox()" title="Kısayol: C">Linki Kopyala</button>
-        
-        <button class="lb-trash" onclick="deleteFromLightbox()" title="Sil (Kısayol: Delete)">
-            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
-        </button>
+        <div class="lb-controls">
+            <button class="lb-copy" id="lbCopyBtn" onclick="copyFromLightbox()" title="Kısayol: C">Linki Kopyala</button>
+            <button class="lb-trash" onclick="deleteFromLightbox()" title="Sil (Kısayol: Delete)">
+                <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            </button>
+        </div>
     </div>
 </div>
 
-<div id="detailsModal" class="modal">
+<div id="detailsModal" class="modal" onclick="closeIfBackdrop(event, 'detailsModal')">
     <div class="details-modal-content">
-        <span class="close-details" onclick="closeDetails()">&times;</span>
         <div class="details-header">
             <h3 data-lang="modalTitle" style="margin:0;">Oluşturulan Linkler</h3>
             <button class="btn-copy-all" onclick="copyAllLinks()">
                 <svg style="width:16px;height:16px;fill:white" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
-                <span data-lang="btnCopyAll">Tümünü Kopyala</span>
+                <span data-lang="btnCopyAll">Tüm Linkleri Kopyala</span>
             </button>
+            <span class="close-details" onclick="closeDetails()">&times;</span>
         </div>
         <table class="link-table">
             <thead>
@@ -292,14 +305,15 @@
     let currentLang = 'tr';
     let dinamikModAktif = false; 
     let activeLightboxIndex = 0; 
+    let activeImageId = null; // Sadece son eklenen resim aktif olur
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
     const translations = {
-        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "https://drive.google.com/file/d/....", btnConvert: "Dönüştür", labelGallery: "Oluşturulan Resimler:", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Linki Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tümünü Kopyala" },
-        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste your link here...", btnConvert: "Convert", labelGallery: "Generated Images:", btnDetails: "Detailed List", btnClear: "Clear All", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy Link", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All" },
-        de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Link hier einfügen...", btnConvert: "Umwandeln", labelGallery: "Generierte Bilder:", btnDetails: "Detaillierte Liste", btnClear: "Alles löschen", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", btnCopy: "Link kopieren", modalTitle: "Generierte Links", thImage: "Bild", thDirect: "Direktlink", thAction: "Aktion", btnDelete: "Löschen", btnCopyAll: "Alles Kopieren" },
-        fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez votre lien ici...", btnConvert: "Convertir", labelGallery: "Images générées :", btnDetails: "Liste détaillée", btnClear: "Tout effacer", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", btnCopy: "Copier le lien", modalTitle: "Liens générés", thImage: "Image", thDirect: "Lien direct", thAction: "Action", btnDelete: "Supprimer", btnCopyAll: "Tout Copier" },
-        es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega tu enlace aquí...", btnConvert: "Convertir", labelGallery: "Imágenes Generadas:", btnDetails: "Lista Detallada", btnClear: "Borrar Todo", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", btnCopy: "Copiar Enlace", modalTitle: "Enlaces Generados", thImage: "Imagen", thDirect: "Enlace Directo", thAction: "Acción", btnDelete: "Eliminar", btnCopyAll: "Copiar Todo" }
+        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "https://drive.google.com/file/d/....", btnConvert: "Dönüştür", labelGallery: "Oluşturulan Resimler:", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Linki Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tüm Linkleri Kopyala", confirmDelAll: "Tüm galeri silinecek. Emin misiniz?", confirmDelOne: "Bu resmi silmek istediğinize emin misiniz?" },
+        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste your link here...", btnConvert: "Convert", labelGallery: "Generated Images:", btnDetails: "Detailed List", btnClear: "Clear All", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy Link", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All Links", confirmDelAll: "All gallery will be deleted. Are you sure?", confirmDelOne: "Are you sure you want to delete this image?" },
+        de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Link hier einfügen...", btnConvert: "Umwandeln", labelGallery: "Generierte Bilder:", btnDetails: "Detaillierte Liste", btnClear: "Alles löschen", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", btnCopy: "Link kopieren", modalTitle: "Generierte Links", thImage: "Bild", thDirect: "Direktlink", thAction: "Aktion", btnDelete: "Löschen", btnCopyAll: "Alle Kopieren", confirmDelAll: "Die gesamte Galerie wird gelöscht. Sind Sie sicher?", confirmDelOne: "Möchten Sie dieses Bild wirklich löschen?" },
+        fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez votre lien ici...", btnConvert: "Convertir", labelGallery: "Images générées :", btnDetails: "Liste détaillée", btnClear: "Tout effacer", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", btnCopy: "Copier le lien", modalTitle: "Liens générés", thImage: "Image", thDirect: "Lien direct", thAction: "Action", btnDelete: "Supprimer", btnCopyAll: "Tout Copier", confirmDelAll: "Toute la galerie sera supprimée. Êtes-vous sûr ?", confirmDelOne: "Êtes-vous sûr de vouloir supprimer cette image ?" },
+        es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega tu enlace aquí...", btnConvert: "Convertir", labelGallery: "Imágenes Generadas:", btnDetails: "Lista Detallada", btnClear: "Borrar Todo", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", btnCopy: "Copiar Enlace", modalTitle: "Enlaces Generados", thImage: "Imagen", thDirect: "Enlace Directo", thAction: "Acción", btnDelete: "Eliminar", btnCopyAll: "Copiar Todo", confirmDelAll: "¿Se eliminará toda la galería. Estás seguro?", confirmDelOne: "¿Estás seguro de que quieres eliminar esta imagen?" }
     };
 
     function toggleLangMenu(e) { e.stopPropagation(); var l = document.getElementById("langList"); l.style.display = (l.style.display === "block") ? "none" : "block"; }
@@ -314,7 +328,15 @@
         if(!lbCopy.innerText.includes("!")) lbCopy.innerText = t.btnCopy;
         var btnConvert = document.getElementById('btnConvert');
         if (!btnConvert.classList.contains('error-shake')) btnConvert.innerText = t.btnConvert;
-        if(document.getElementById("detailsModal").style.display === "block") showDetails(); // Tabloyu güncelle
+        if(document.getElementById("detailsModal").style.display === "block") showDetails(); 
+    }
+
+    // --- MODAL KAPATMA (BACKDROP TIKLAMA) ---
+    function closeIfBackdrop(e, modalId) {
+        if(e.target === document.getElementById(modalId)) {
+            if(modalId === 'lightboxModal') closeLightbox();
+            if(modalId === 'detailsModal') closeDetails();
+        }
     }
 
     function linkDonustur() {
@@ -327,10 +349,19 @@
         if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) { val = "https://" + val; inputElement.value = val; }
         var idMatch = val.match(driveRegex);
         if (!idMatch) { hataAnimasyonu(t.errInvalid); return; }
+        
         var fileID = idMatch[1];
         var newLink = "https://drive.google.com/thumbnail?id=" + fileID + "&sz=w10000";
+        
+        // Tekrar kontrolü
         history = history.filter(item => item.id !== fileID);
+        
+        // Yeni ekle
         history.push({ id: fileID, directLink: newLink, originalLink: val });
+        
+        // Sadece bu ID aktif olsun
+        activeImageId = fileID;
+        
         renderGallery();
         dinamikModAktif = false; btn.classList.add("success-lock");
     }
@@ -348,21 +379,24 @@
         }
         history.forEach((item, index) => {
             let div = document.createElement("div"); div.className = "gallery-item";
-            if(index === history.length - 1) div.classList.add("active-item");
+            
+            // AKILLI SEÇİM: Sadece aktif ID ile eşleşirse yeşil çerçeve koy
+            if(item.id === activeImageId) div.classList.add("active-item");
+            
             let img = document.createElement("img"); img.src = item.directLink; img.onclick = () => openLightbox(index);
             let btn = document.createElement("div"); btn.className = "overlay-copy-btn";
             btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>';
-            btn.onclick = (e) => { e.stopPropagation(); copyDirect(item.directLink, btn); };
+            btn.onclick = (e) => { e.stopPropagation(); copyDirect(item.directLink, btn, img); };
             div.appendChild(img); div.appendChild(btn); grid.appendChild(div);
         });
-        // Eğer detay tablosu açıksa onu da güncelle
-        if(document.getElementById("detailsModal").style.display === "block") {
-            showDetails();
-        }
+        if(document.getElementById("detailsModal").style.display === "block") { showDetails(); }
     }
 
     function clearGallery() {
-        history = []; renderGallery();
+        const t = translations[currentLang];
+        if(!confirm(t.confirmDelAll)) return;
+        history = []; activeImageId = null; 
+        renderGallery();
         document.getElementById("driveLink").value = "";
         document.getElementById("btnConvert").classList.remove("success-lock");
     }
@@ -398,8 +432,17 @@
     }
 
     function lightboxKeyHandler(e) {
-        if (e.key === "ArrowRight") changeSlide(1);
-        if (e.key === "ArrowLeft") changeSlide(-1);
+        // KLAVYE SENKRONİZASYONU
+        if (e.key === "ArrowRight") {
+            changeSlide(1);
+            let btn = document.querySelector(".lb-next");
+            btn.classList.add("key-active"); setTimeout(() => btn.classList.remove("key-active"), 150);
+        }
+        if (e.key === "ArrowLeft") {
+            changeSlide(-1);
+            let btn = document.querySelector(".lb-prev");
+            btn.classList.add("key-active"); setTimeout(() => btn.classList.remove("key-active"), 150);
+        }
         if (e.key === "Escape") closeLightbox();
         if (e.key.toLowerCase() === "c") copyFromLightbox();
         if (e.key === "Delete" || e.key === "Backspace") deleteFromLightbox();
@@ -415,26 +458,21 @@
         });
     }
 
-    // --- YENİ SİLME FONKSİYONU (LIGHTBOX) ---
     function deleteFromLightbox() {
-        if(history.length === 0) return;
-        // Diziden sil
+        const t = translations[currentLang];
+        if(!confirm(t.confirmDelOne)) return;
+        
+        let deletedId = history[activeLightboxIndex].id;
         history.splice(activeLightboxIndex, 1);
         
-        // Eğer sildikten sonra index liste dışına çıkarsa (son elemanı sildiysek)
-        if(activeLightboxIndex >= history.length) {
-            activeLightboxIndex = history.length - 1;
-        }
+        // Eğer silinen resim aktif çerçeveli olandıysa, aktifliği sıfırla
+        if(deletedId === activeImageId) activeImageId = null;
 
-        // Arka planı güncelle
+        if(activeLightboxIndex >= history.length) activeLightboxIndex = history.length - 1;
+
         renderGallery();
-        
-        // Lightbox'ı güncelle (veya kapat)
-        if(history.length === 0) {
-            closeLightbox();
-        } else {
-            updateLightboxContent();
-        }
+        if(history.length === 0) closeLightbox();
+        else updateLightboxContent();
     }
 
     function showDetails() {
@@ -443,11 +481,10 @@
         tbody.innerHTML = "";
         history.forEach((item, index) => {
             let row = document.createElement("tr");
-            
             let cellImg = document.createElement("td");
             let img = document.createElement("img");
             img.src = item.directLink; img.className = "tbl-thumb";
-            img.onclick = () => { /* Lightbox'ı aç ama detayları kapatma */ openLightbox(index); };
+            img.onclick = () => { openLightbox(index); };
             cellImg.appendChild(img);
 
             let cellLink = document.createElement("td");
@@ -467,13 +504,17 @@
             let btnDel = document.createElement("button");
             btnDel.className = "btn-danger-sm"; btnDel.innerText = t.btnDelete;
             btnDel.onclick = () => {
+                if(!confirm(t.confirmDelOne)) return;
+                
+                let deletedId = history[index].id;
                 history.splice(index, 1);
-                renderGallery(); // Tabloyu da tetikler
+                if(deletedId === activeImageId) activeImageId = null;
+                
+                renderGallery(); 
                 if(history.length === 0) closeDetails();
             };
 
-            cellAct.appendChild(btnCopy);
-            cellAct.appendChild(btnDel);
+            cellAct.appendChild(btnCopy); cellAct.appendChild(btnDel);
             row.appendChild(cellImg); row.appendChild(cellLink); row.appendChild(cellAct);
             tbody.appendChild(row);
         });
@@ -487,15 +528,22 @@
             let btn = document.querySelector(".btn-copy-all span");
             let oldText = btn.innerText;
             btn.innerText = t.msgCopied;
-            setTimeout(() => { btn.innerText = t.btnCopyAll || "Tümünü Kopyala"; }, 1500);
+            setTimeout(() => { btn.innerText = t.btnCopyAll || "Tüm Linkleri Kopyala"; }, 1500);
         });
     }
 
     function closeDetails() { document.getElementById("detailsModal").style.display = "none"; }
-    function copyDirect(link, btnElement) {
+    
+    // THUMBNAIL COPY + FLASH ANIMATION
+    function copyDirect(link, btnElement, imgElement) {
         navigator.clipboard.writeText(link).then(() => {
             let originalBg = btnElement.style.background;
             btnElement.style.background = "#198754"; btnElement.style.color = "white";
+            
+            // Resme flash efekti ekle
+            imgElement.classList.add("flash-anim");
+            setTimeout(() => imgElement.classList.remove("flash-anim"), 400);
+
             setTimeout(() => { btnElement.style.background = ""; btnElement.style.color = ""; }, 500);
         });
     }
