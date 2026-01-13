@@ -51,7 +51,7 @@
         @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
         .error-shake { animation: shake 0.3s ease-in-out; background-color: #dc3545 !important; }
 
-        /* --- INFO TIP (UYARI NOTU) --- */
+        /* --- INFO TIP --- */
         #infoTip {
             background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;
             padding: 12px 40px 12px 15px; border-radius: 4px; margin-top: 15px;
@@ -65,7 +65,7 @@
         }
         .info-close:hover { color: #533f03; }
 
-        /* --- CARD VIEW --- */
+        /* --- CARD VIEW (TEKİL GÖSTERİM) --- */
         #cardsArea { margin-top: 20px; display: none; }
         .result-card {
             display: flex; align-items: center; 
@@ -132,126 +132,63 @@
         .btn-delete-selected:hover { background: #bb2d3b; }
 
         /* --- MODALS --- */
-        .modal {
-            display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; 
-            overflow: auto; backdrop-filter: blur(4px);
-        }
+        .modal { display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; backdrop-filter: blur(4px); }
         #detailsModal { z-index: 1000; background-color: rgba(0,0,0,0.6); }
         #lightboxModal { z-index: 2000; background-color: rgba(0,0,0,0.95); }
         #confirmModal { z-index: 3000; background-color: rgba(0,0,0,0.5); }
 
-        /* --- LIGHTBOX --- */
-        .lightbox-container {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; cursor: pointer;
-        }
-        .lightbox-img {
-            max-width: 90%; max-height: 80vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5);
-            transition: transform 0.1s linear; cursor: default;
-        }
-        
-        .lb-btn {
-            position: absolute; background: rgba(255,255,255,0.15); color: white; border: none;
-            cursor: pointer; padding: 20px; font-size: 30px; border-radius: 5px; top: 50%; 
-            transform: translateY(-50%); transition: background 0.2s, transform 0.1s; user-select: none;
-        }
+        /* --- LIGHTBOX STYLES (Özetlendi) --- */
+        .lightbox-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; cursor: pointer; }
+        .lightbox-img { max-width: 90%; max-height: 80vh; border-radius: 4px; box-shadow: 0 0 30px rgba(0,0,0,0.5); transition: transform 0.1s linear; cursor: default; }
+        .lb-btn { position: absolute; background: rgba(255,255,255,0.15); color: white; border: none; cursor: pointer; padding: 20px; font-size: 30px; border-radius: 5px; top: 50%; transform: translateY(-50%); transition: background 0.2s, transform 0.1s; user-select: none; }
         .lb-btn:hover { background: rgba(255,255,255,0.4); }
-        .lb-btn.key-active, .lb-btn:active { transform: translateY(-50%) scale(0.9) !important; background: rgba(255,255,255,0.6); }
         .lb-prev { left: 20px; } .lb-next { right: 20px; }
         .hide-nav .lb-btn, .hide-nav .lb-right-group { display: none !important; }
-
-        .lb-bottom-bar {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 40px;
-            width: auto; min-width: 320px; gap: 30px; cursor: default;
-        }
-        
-        .lb-left-group { display: flex; align-items: center; } 
-        .lb-center-group { display: flex; gap: 10px; align-items: center; justify-content: center; flex: 1; } 
-        .lb-right-group { display: flex; gap: 2px; align-items: center; } 
-
-        .lb-mini-nav {
-            background: rgba(255,255,255,0.2); color: white; border: none; width: 40px; height: 40px;
-            cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s;
-        }
+        .lb-bottom-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.7); padding: 10px 25px; border-radius: 40px; width: auto; min-width: 320px; gap: 30px; cursor: default; }
+        .lb-mini-nav { background: rgba(255,255,255,0.2); color: white; border: none; width: 40px; height: 40px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
         .lb-mini-nav:hover { background: rgba(255,255,255,0.4); }
-        .lb-mini-nav:active { transform: scale(0.9); }
+        .lb-right-group { display: flex; gap: 2px; }
         .lb-right-group .lb-mini-nav:first-child { border-radius: 20px 0 0 20px; }
         .lb-right-group .lb-mini-nav:last-child { border-radius: 0 20px 20px 0; }
-
-        .lb-zoom-btn {
-            background: rgba(255,255,255,0.2); color: white; border: none; width: 35px; height: 35px;
-            cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; user-select: none;
-        }
-        .lb-zoom-btn:hover { background: rgba(255,255,255,0.4); }
-        .lb-zoom-btn:active { background: rgba(255,255,255,0.6); }
         .lb-zoom-group { display: flex; border-radius: 20px; overflow: hidden; margin-right: 10px;}
-
-        .lb-copy {
-            background: #fd7e14; color: white; padding: 0 20px; height: 40px; border-radius: 20px; border: none;
-            cursor: pointer; font-weight: bold; transition: background 0.2s, transform 0.1s; white-space: nowrap; font-size: 14px;
-        }
-        .lb-copy:hover { background: #e36906; } .lb-copy:active { transform: scale(0.95); }
-
-        .lb-trash {
-            background: rgba(220, 53, 69, 0.8); color: white; width: 40px; height: 40px; border-radius: 50%; border: none;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.1s;
-        }
-        .lb-trash:hover { background: #dc3545; } .lb-trash:active { transform: scale(0.9); }
+        .lb-zoom-btn { background: rgba(255,255,255,0.2); color: white; border: none; width: 35px; height: 35px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; user-select: none; }
+        .lb-zoom-btn:hover { background: rgba(255,255,255,0.4); }
+        .lb-copy { background: #fd7e14; color: white; padding: 0 20px; height: 40px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold; transition: background 0.2s; white-space: nowrap; font-size: 14px; }
+        .lb-copy:hover { background: #e36906; }
+        .lb-trash { background: rgba(220, 53, 69, 0.8); color: white; width: 40px; height: 40px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .lb-trash:hover { background: #dc3545; }
         .lb-trash svg { width: 18px; height: 18px; fill: white; }
-
         .close-modal { position: absolute; top: 20px; right: 30px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 2002; }
 
         /* --- DETAY TABLOSU --- */
-        .details-modal-content {
-            background-color: #fefefe; margin: 5% auto; border: 1px solid #888;
-            width: 90%; max-width: 800px; border-radius: 8px; display: flex; flex-direction: column; max-height: 90vh;
-        }
+        .details-modal-content { background-color: #fefefe; margin: 5% auto; border: 1px solid #888; width: 90%; max-width: 800px; border-radius: 8px; display: flex; flex-direction: column; max-height: 90vh; }
         .details-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
         .details-body { overflow-y: auto; padding: 20px; scrollbar-width: thin; scrollbar-color: #ccc #f1f1f1; }
         .details-body::-webkit-scrollbar { width: 8px; }
         .details-body::-webkit-scrollbar-track { background: #f1f1f1; }
         .details-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
-        .details-body::-webkit-scrollbar-thumb:hover { background: #bbb; }
         .details-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; background: #f9f9f9; border-radius: 0 0 8px 8px; }
         .close-details { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
         .close-details:hover { color: black; }
-
         .link-list-container { display: flex; flex-direction: column; gap: 10px; }
-        .link-row { 
-            display: grid; grid-template-columns: 80px 340px auto auto; gap: 15px; 
-            align-items: center; justify-content: center; border-bottom: 1px solid #eee; padding-bottom: 10px; 
-        }
+        .link-row { display: grid; grid-template-columns: 80px 340px auto auto; gap: 15px; align-items: center; justify-content: center; border-bottom: 1px solid #eee; padding-bottom: 10px; }
         .link-row:last-child { border-bottom: none; }
-        .link-header { 
-            display: grid; grid-template-columns: 80px 340px auto auto; gap: 15px; 
-            background: #f2f2f2; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 5px;
-            justify-content: center;
-        }
+        .link-header { display: grid; grid-template-columns: 80px 340px auto auto; gap: 15px; background: #f2f2f2; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 5px; justify-content: center; }
         .tbl-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; }
-        .link-text-wrapper {
-            overflow: hidden; background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 4px;
-            display: flex; align-items: center; min-width: 0; max-width: 400px; 
-        }
-        .link-text { overflow-x: auto; white-space: nowrap; font-family: monospace; color: #555; width: 100%; scrollbar-width: none; -ms-overflow-style: none; }
+        .link-text-wrapper { overflow: hidden; background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 4px; display: flex; align-items: center; min-width: 0; max-width: 400px; }
+        .link-text { overflow-x: auto; white-space: nowrap; font-family: monospace; color: #555; width: 100%; scrollbar-width: none; }
         .link-text::-webkit-scrollbar { display: none; }
-
         .btn-copy-sm { background: #6c757d; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
         .btn-copy-sm:hover { background: #5c636a; }
         .btn-danger-sm { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; white-space: nowrap; }
         .btn-danger-sm:hover { background: #bb2d3b; }
-
         .btn-footer { padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; border: none; display: flex; align-items: center; gap: 8px; color: white; font-weight: 500; }
         .btn-copy-all { background: #198754; } .btn-copy-all:hover { background: #157347; }
         .btn-excel { background: #217346; } .btn-excel:hover { background: #1a5c38; }
 
         /* --- CUSTOM CONFIRM MODAL --- */
         .confirm-box { background: white; width: 450px; margin: 10% auto; padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .confirm-images-grid {
-            display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;
-            max-height: 200px; overflow-y: auto; margin: 15px 0; padding: 5px; border: 1px solid #eee; border-radius: 4px;
-        }
+        .confirm-images-grid { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; max-height: 200px; overflow-y: auto; margin: 15px 0; padding: 5px; border: 1px solid #eee; border-radius: 4px; }
         .confirm-thumb { width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
         .confirm-btns { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
         .btn-yes { background: #dc3545; color: white; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; }
@@ -362,7 +299,7 @@
     <div id="cardsArea"></div>
 
     <div id="galleryArea">
-        <label class="label" id="galleryLabel" data-lang="galleryTitleAll">Tüm Resimler:</label>
+        <label class="label" data-lang="galleryTitleAll">Tüm Resimler:</label>
         <div class="gallery-grid" id="galleryGrid"></div>
         <div class="batch-controls" id="batchControls">
             <button class="btn-delete-selected" id="btnDelSel" onclick="confirmDeleteSelected()" data-lang="btnDeleteSelected">Seçilenleri Sil</button>
@@ -384,18 +321,30 @@
     let selectedIndices = []; 
     let currentZoom = 1; 
     let navPreference = 'mid'; // 'mid' | 'bot'
-    // İYİLEŞTİRME: isExpertUser durumu localStorage'dan okunacak
-    let isExpertUser = localStorage.getItem('driveGallery_expert') === 'true'; 
-    let isTipClosed = localStorage.getItem('driveGallery_tipClosed') === 'true'; // Kalıcı kapama
     
+    // LEARNING STATES (LocalStorage)
+    let isExpertUser = localStorage.getItem('driveGallery_expert') === 'true'; 
+    let isTipClosed = localStorage.getItem('driveGallery_tipClosed') === 'true'; 
+    
+    // YENİ STATE: Bu oturumda kaçıncı işlem? (Acemiye ızgara göstermeme mantığı için)
+    let conversionCount = 0;
+
     navPreference = Math.random() > 0.5 ? 'mid' : 'bot';
     let zoomInterval = null; 
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
 
     const translations = {
-        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "Linkleri buraya yapıştırın (Virgülle ayırabilirsiniz)...", btnConvert: "Dönüştür", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", btnReset: "Sıfırla", btnDeleteSelected: "Seçilenleri Sil", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tümünü Kopyala", btnExcel: "Excel İndir", confirmTitle: "Silme Onayı", confirmDelAll: "Tüm galeri silinecek. Emin misiniz?", confirmDelOne: "Bu resmi silmek istediğinize emin misiniz?", confirmDelSel: "Seçilen resimleri silmek istediğinize emin misiniz?", btnYes: "Evet, Sil", btnNo: "İptal", pasteTooltip: "Panodan Yapıştır", galleryTitleAll: "Tüm Resimler:", galleryTitleMulti: "Çoklu Resimler:", infoText: "Direkt resim urllerini kopyalamak istediğiniz resimlerin üzerindeki url simgesini tıklayınız" },
-        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste links here (comma separated)...", btnConvert: "Convert", btnDetails: "Detailed List", btnClear: "Clear All", btnReset: "Reset", btnDeleteSelected: "Delete Selected", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All", btnExcel: "Download Excel", confirmTitle: "Delete Confirmation", confirmDelAll: "All gallery will be deleted. Are you sure?", confirmDelOne: "Are you sure you want to delete this image?", confirmDelSel: "Are you sure you want to delete selected images?", btnYes: "Yes, Delete", btnNo: "Cancel", pasteTooltip: "Paste from Clipboard", galleryTitleAll: "All Images:", galleryTitleMulti: "Multiple Images:", infoText: "Click the url icon on the images to copy direct image urls" },
-        // ... (Diğer diller yer tutucu) ...
+        tr: { title: "Google Drive Resim Linki Dönüştürücü", labelInput: "Normal Drive Linki:", placeholder: "Linkleri buraya yapıştırın (Virgülle ayırabilirsiniz)...", btnConvert: "Dönüştür", btnDetails: "Detaylı Liste", btnClear: "Tümünü Temizle", btnReset: "Sıfırla", btnDeleteSelected: "Seçilenleri Sil", errEmpty: "Link Girilmedi!", errInvalid: "Geçersiz Link!", msgCopied: "Kopyalandı!", btnCopy: "Kopyala", modalTitle: "Oluşturulan Linkler", thImage: "Resim", thDirect: "Direkt Link", thAction: "İşlem", btnDelete: "Sil", btnCopyAll: "Tümünü Kopyala", btnExcel: "Excel İndir", confirmTitle: "Silme Onayı", confirmDelAll: "Tüm galeri silinecek. Emin misiniz?", confirmDelOne: "Bu resmi silmek istediğinize emin misiniz?", confirmDelSel: "Seçilen resimleri silmek istediğinize emin misiniz?", btnYes: "Evet, Sil", btnNo: "İptal", pasteTooltip: "Panodan Yapıştır", galleryTitleAll: "Tüm Resimler:", infoText: "Direkt resim urllerini kopyalamak istediğiniz resimlerin üzerindeki url simgesini tıklayınız" },
+        en: { title: "Google Drive Direct Link Generator", labelInput: "Original Drive Link:", placeholder: "Paste links here (comma separated)...", btnConvert: "Convert", btnDetails: "Detailed List", btnClear: "Clear All", btnReset: "Reset", btnDeleteSelected: "Delete Selected", errEmpty: "No Link Entered!", errInvalid: "Invalid Link!", msgCopied: "Copied!", btnCopy: "Copy", modalTitle: "Generated Links", thImage: "Image", thDirect: "Direct Link", thAction: "Action", btnDelete: "Delete", btnCopyAll: "Copy All", btnExcel: "Download Excel", confirmTitle: "Delete Confirmation", confirmDelAll: "All gallery will be deleted. Are you sure?", confirmDelOne: "Are you sure you want to delete this image?", confirmDelSel: "Are you sure you want to delete selected images?", btnYes: "Yes, Delete", btnNo: "Cancel", pasteTooltip: "Paste from Clipboard", galleryTitleAll: "All Images:", infoText: "Click the url icon on the images to copy direct image urls" },
+        de: { title: "Google Drive Direktlink-Generator", labelInput: "Original-Link:", placeholder: "Links hier einfügen...", btnConvert: "Umwandeln", btnDetails: "Detaillierte Liste", btnClear: "Alles löschen", btnReset: "Zurücksetzen", btnDeleteSelected: "Ausgewählte löschen", errEmpty: "Kein Link eingegeben!", errInvalid: "Ungültiger Link!", msgCopied: "Kopiert!", btnCopy: "Kopieren", modalTitle: "Generierte Links", thImage: "Bild", thDirect: "Direktlink", thAction: "Aktion", btnDelete: "Löschen", btnCopyAll: "Alles Kopieren", btnExcel: "Excel Herunterladen", confirmTitle: "Löschbestätigung", confirmDelAll: "Die gesamte Galerie wird gelöscht. Sind Sie sicher?", confirmDelOne: "Möchten Sie dieses Bild wirklich löschen?", confirmDelSel: "Möchten Sie die ausgewählten Bilder löschen?", btnYes: "Ja, Löschen", btnNo: "Abbrechen", pasteTooltip: "Aus Zwischenablage einfügen", galleryTitleAll: "Alle Bilder:", infoText: "Klicken Sie auf das URL-Symbol auf den Bildern, um direkte Bild-URLs zu kopieren" },
+        fr: { title: "Générateur de liens directs Drive", labelInput: "Lien Original:", placeholder: "Collez les liens ici...", btnConvert: "Convertir", btnDetails: "Liste détaillée", btnClear: "Tout effacer", btnReset: "Réinitialiser", btnDeleteSelected: "Supprimer la sélection", errEmpty: "Aucun lien saisi !", errInvalid: "Lien invalide !", msgCopied: "Copié !", btnCopy: "Copier", modalTitle: "Liens générés", thImage: "Image", thDirect: "Lien direct", thAction: "Action", btnDelete: "Supprimer", btnCopyAll: "Tout Copier", btnExcel: "Télécharger Excel", confirmTitle: "Confirmation de suppression", confirmDelAll: "Toute la galerie sera supprimée. Êtes-vous sûr ?", confirmDelOne: "Êtes-vous sûr de vouloir supprimer cette image ?", confirmDelSel: "Êtes-vous sûr de vouloir supprimer les images sélectionnées ?", btnYes: "Oui, Supprimer", btnNo: "Annuler", pasteTooltip: "Coller depuis le presse-papiers", galleryTitleAll: "Toutes les images :", infoText: "Cliquez sur l'icône url sur les images pour copier les urls directes des images" },
+        es: { title: "Generador de Enlaces Directos Drive", labelInput: "Enlace Original:", placeholder: "Pega los enlaces aquí...", btnConvert: "Convertir", btnDetails: "Lista Detallada", btnClear: "Borrar Todo", btnReset: "Reiniciar", btnDeleteSelected: "Eliminar Seleccionados", errEmpty: "¡Enlace no introducido!", errInvalid: "¡Enlace Inválido!", msgCopied: "¡Copiado!", btnCopy: "Copiar", modalTitle: "Enlaces Generados", thImage: "Imagen", thDirect: "Enlace Directo", thAction: "Acción", btnDelete: "Eliminar", btnCopyAll: "Copiar Todo", btnExcel: "Descargar Excel", confirmTitle: "Confirmación de eliminación", confirmDelAll: "¿Se eliminará toda la galería. Estás seguro?", confirmDelOne: "¿Estás seguro de que quieres eliminar esta imagen?", confirmDelSel: "¿Estás seguro de que quieres eliminar las imágenes seleccionadas?", btnYes: "Sí, Eliminar", btnNo: "Cancelar", pasteTooltip: "Pegar desde portapapeles", galleryTitleAll: "Todas las imágenes:", infoText: "Haga clic en el icono de url en las imágenes para copiar las urls directas de las imágenes" },
+        zh: { title: "Google Drive 直接链接生成器", labelInput: "原始 Drive 链接：", placeholder: "在此处粘贴链接...", btnConvert: "转换", btnDetails: "详细列表", btnClear: "全部清除", btnReset: "重置", btnDeleteSelected: "删除所选", errEmpty: "未输入链接！", errInvalid: "无效链接！", msgCopied: "已复制！", btnCopy: "复制", modalTitle: "生成的链接", thImage: "图片", thDirect: "直接链接", thAction: "操作", btnDelete: "删除", btnCopyAll: "复制全部", btnExcel: "下载 Excel", confirmTitle: "删除确认", confirmDelAll: "所有图库都将被删除。你确定吗？", confirmDelOne: "您确定要删除此图片吗？", confirmDelSel: "您确定要删除所选图片吗？", btnYes: "是，删除", btnNo: "取消", pasteTooltip: "从剪贴板粘贴", galleryTitleAll: "所有图像：", infoText: "点击图片上的 url 图标以复制直接图片 url" },
+        ru: { title: "Генератор прямых ссылок Drive", labelInput: "Исходная ссылка:", placeholder: "Вставьте ссылки сюда...", btnConvert: "Конвертировать", btnDetails: "Подробный список", btnClear: "Очистить все", btnReset: "Сброс", btnDeleteSelected: "Удалить выбранные", errEmpty: "Ссылка не введена!", errInvalid: "Неверная ссылка!", msgCopied: "Скопировано!", btnCopy: "Копировать", modalTitle: "Созданные ссылки", thImage: "Изображение", thDirect: "Прямая ссылка", thAction: "Действие", btnDelete: "Удалить", btnCopyAll: "Копировать все", btnExcel: "Скачать Excel", confirmTitle: "Подтверждение удаления", confirmDelAll: "Вся галерея будет удалена. Вы уверены?", confirmDelOne: "Вы уверены, что хотите удалить это изображение?", confirmDelSel: "Вы уверены, что хотите удалить выбранные изображения?", btnYes: "Да, удалить", btnNo: "Отмена", pasteTooltip: "Вставить из буфера", galleryTitleAll: "Все изображения:", infoText: "Нажмите на значок url на изображениях, чтобы скопировать прямые url изображений" },
+        ar: { title: "محول روابط جوجل درايف", labelInput: "رابط درايف الأصلي:", placeholder: "الصق الروابط هنا...", btnConvert: "تحويل", btnDetails: "قائمة مفصلة", btnClear: "مسح الكل", btnReset: "إعادة ضبط", btnDeleteSelected: "حذف المختار", errEmpty: "لم يتم إدخال رابط!", errInvalid: "رابط غير صالح!", msgCopied: "تم النسخ!", btnCopy: "نسخ", modalTitle: "الروابط التي تم إنشاؤها", thImage: "صورة", thDirect: "رابط مباشر", thAction: "عمل", btnDelete: "حذف", btnCopyAll: "نسخ الكل", btnExcel: "تحميل إكسل", confirmTitle: "تأكيد الحذف", confirmDelAll: "سيتم حذف كل المعرض. هل أنت متأكد؟", confirmDelOne: "هل أنت متأكد أنك تريد حذف هذه الصورة؟", confirmDelSel: "هل أنت متأكد أنك تريد حذف الصور المحددة؟", btnYes: "نعم، حذف", btnNo: "إلغاء", pasteTooltip: "لصق من الحافظة", galleryTitleAll: "كل الصور:", infoText: "انقر فوق رمز url على الصور لنسخ عناوين url المباشرة للصور" },
+        hi: { title: "Google Drive डायरेक्ट लिंक जेनरेटर", labelInput: "मूल ड्राइव लिंक:", placeholder: "लिंक यहाँ पेस्ट करें...", btnConvert: "बदलें", btnDetails: "विस्तृत सूची", btnClear: "सभी साफ करें", btnReset: "रीसेट", btnDeleteSelected: "चयनित हटाएं", errEmpty: "लिंक दर्ज नहीं किया गया!", errInvalid: "अमान्य लिंक!", msgCopied: "कॉपी हो गया!", btnCopy: "कॉपी", modalTitle: "उत्पन्न लिंक", thImage: "छवि", thDirect: "डायरेक्ट लिंक", thAction: "कार्रवाई", btnDelete: "हटाएं", btnCopyAll: "सभी कॉपी करें", btnExcel: "एक्सेल डाउनलोड करें", confirmTitle: "हटाने की पुष्टि", confirmDelAll: "पूरी गैलरी हटा दी जाएगी। क्या आपको यकीन है?", confirmDelOne: "क्या आप वाकई इस छवि को हटाना चाहते हैं?", confirmDelSel: "क्या आप वाकई चयनित छवियों को हटाना चाहते हैं?", btnYes: "हाँ, हटाएं", btnNo: "रद्द करें", pasteTooltip: "क्लिपबोर्ड से चिपकाएं", galleryTitleAll: "सभी चित्र:", infoText: "प्रत्यक्ष छवि url कॉपी करने के लिए छवियों पर url आइकन पर क्लिक करें" },
+        pt: { title: "Gerador de Links Diretos Drive", labelInput: "Link Original:", placeholder: "Cole os links aqui...", btnConvert: "Converter", btnDetails: "Lista Detalhada", btnClear: "Limpar Tudo", btnReset: "Redefinir", btnDeleteSelected: "Excluir Selecionados", errEmpty: "Nenhum link inserido!", errInvalid: "Link Inválido!", msgCopied: "Copiado!", btnCopy: "Copiar", modalTitle: "Links Gerados", thImage: "Imagem", thDirect: "Link Direto", thAction: "Ação", btnDelete: "Excluir", btnCopyAll: "Copiar Tudo", btnExcel: "Baixar Excel", confirmTitle: "Confirmação de Exclusão", confirmDelAll: "Toda a galeria será excluída. Tem certeza?", confirmDelOne: "Tem certeza de que deseja excluir esta imagem?", confirmDelSel: "Tem certeza de que deseja excluir as imagens selecionadas?", btnYes: "Sim, Excluir", btnNo: "Cancelar", pasteTooltip: "Colar da área de transferência", galleryTitleAll: "Todas as imagens:", infoText: "Clique no ícone de url nas imagens para copiar os urls diretos das imagens" },
+        ja: { title: "Google Drive 直リンク作成ツール", labelInput: "元のリンク:", placeholder: "ここにリンクを貼り付け...", btnConvert: "変換", btnDetails: "詳細リスト", btnClear: "すべてクリア", btnReset: "リセット", btnDeleteSelected: "選択項目を削除", errEmpty: "リンク未入力！", errInvalid: "無効なリンクです!", msgCopied: "コピーしました!", btnCopy: "コピー", modalTitle: "生成されたリンク", thImage: "画像", thDirect: "直リンク", thAction: "操作", btnDelete: "削除", btnCopyAll: "すべてコピー", btnExcel: "Excelをダウンロード", confirmTitle: "削除の確認", confirmDelAll: "すべてのギャラリーが削除されます。よろしいですか？", confirmDelOne: "この画像を削除してもよろしいですか？", confirmDelSel: "選択した画像を削除してもよろしいですか？", btnYes: "はい、削除", btnNo: "キャンセル", pasteTooltip: "クリップボードから貼り付け", galleryTitleAll: "すべての画像:", infoText: "画像のurlアイコンをクリックして、直リンクをコピーします" }
     };
 
     function handleGlobalClick(e) {
@@ -447,7 +396,6 @@
         if (!isExpertUser) {
             isExpertUser = true;
             localStorage.setItem('driveGallery_expert', 'true');
-            // Anında UI güncellemeye gerek yok, bir sonraki işlemde devreye girer
         }
     }
 
@@ -472,9 +420,14 @@
         
         lastAddedIds = []; 
 
-        // EXPERT CHECK: Çoklu link girildiyse kullanıcı uzmandır
-        if(links.length > 1) {
-            setExpertUser();
+        if(links.length > 0) {
+            // İşlem sayısını artır
+            conversionCount++;
+            
+            // EXPERT CHECK: Çoklu link girildiyse kullanıcı uzmandır
+            if(links.length > 1) {
+                setExpertUser();
+            }
         }
 
         links.forEach(val => {
@@ -492,13 +445,13 @@
 
         if (!hasValidLink) { hataAnimasyonu(t.errInvalid); return; }
         
-        // İşlem yapıldığı için uyarıyı kapat (Kalıcı olarak)
-        if (!isTipClosed) closeInfoTip();
+        // Eğer grid açılacaksa ve uyarı kapatılmadıysa (updateUI içinde kontrol edilecek ama burada tetikleyici var)
         
         updateUI();
         dinamikModAktif = false; btn.classList.add("success-lock");
     }
 
+    // --- UI GÜNCELLEME (SMART LOGIC) ---
     function updateUI() {
         const cardsArea = document.getElementById("cardsArea");
         const galleryArea = document.getElementById("galleryArea");
@@ -516,50 +469,54 @@
         if (history.length === 0) {
             cardsArea.style.display = "none";
             galleryArea.style.display = "none";
+            infoTip.style.display = "none";
             return;
         }
 
-        // --- AKILLI GÖRÜNÜM MANTIĞI (SMART HYBRID LOGIC) ---
-        // Kart Gösterimi İçin Şartlar:
-        // 1. Toplam sayı <= 3 (Standart Hibrit)
-        // 2. VEYA (Expert Değil VE Sadece 1 tane yeni eklendi) -> Acemi Yardımı
-        let showCards = false;
-        
-        if (history.length <= 3) {
-            showCards = true;
-        } else if (!isExpertUser && lastAddedIds.length === 1) {
-            // Liste kalabalık ama kullanıcı acemi ve tek tek ekliyor -> Son ekleneni kartta göster
-            showCards = true;
-        }
+        // --- AKILLI GÖRÜNÜM KARAR MEKANİZMASI ---
+        let showCard = false;
+        let showGrid = false;
 
-        // Başlık: Her zaman "Tüm Resimler" (V31'de biriktirme hep açık)
-        galleryLabel.innerText = t.galleryTitleAll;
-
-        // KART GÖRÜNÜMÜ RENDER
-        if (showCards) {
-            cardsArea.style.display = "block";
-            
-            // Eğer toplam sayı <= 3 ise hepsini göster
-            // Eğer toplam > 3 ama acemi yardımı ise SADECE son ekleneni göster
-            let itemsForCards = [];
-            if(history.length <= 3) {
-                itemsForCards = history;
-            } else {
-                itemsForCards = history.filter(x => lastAddedIds.includes(x.id));
+        if (isExpertUser) {
+            // Uzman her zaman sadece Izgara görür
+            showCard = false;
+            showGrid = true;
+        } else {
+            // Acemi Mantığı
+            // Kart Gösterimi: Sadece tekil işlem yapıldıysa göster
+            if (lastAddedIds.length === 1) {
+                showCard = true;
             }
 
-            itemsForCards.forEach((item, index) => {
+            // Izgara Gösterimi:
+            // 1. İkinci işlemden itibaren (conversionCount > 1) -> Göster
+            // 2. VEYA Toplam resim sayısı 3'ten fazlaysa -> Göster
+            if (conversionCount > 1 || history.length > 3) {
+                showGrid = true;
+            } else {
+                // İlk işlem ve az sayıdaysa gizle
+                showGrid = false;
+            }
+        }
+
+        // KART GÖRÜNÜMÜ RENDER
+        if (showCard) {
+            cardsArea.style.display = "block";
+            
+            // Acemi modunda her zaman sadece EN SON EKLENEN TEK KARTI göster
+            // lastAddedIds içinde zaten en son eklenenler var. 
+            // Tekil işlem olduğu için lastAddedIds[0] yeterli.
+            
+            let latestId = lastAddedIds[0];
+            let item = history.find(h => h.id === latestId);
+
+            if (item) {
                 let card = document.createElement("div"); card.className = "result-card";
                 
-                // Başlık Mantığı
-                let titleText;
-                if (itemsForCards.length === 1 && history.length > 3) {
-                    titleText = "Son Dönüştürülen (Önizleme)"; // Acemi için özel başlık
-                } else if (itemsForCards.length === 1) {
-                    titleText = "Direkt Resim Linki";
-                } else {
-                    titleText = (index + 1) + ". " + t.thImage;
-                }
+                // Başlık
+                let titleText = "Direkt Resim Linki";
+                // Eğer grid de açıksa, kart sadece "Son Eklenen" olarak belirtilsin
+                if (showGrid) titleText = "Son Eklenen (Önizleme)";
 
                 let img = document.createElement("img"); img.src = item.directLink; img.className = "card-thumb";
                 let globalIndex = history.findIndex(h => h.id === item.id);
@@ -581,53 +538,60 @@
                 content.appendChild(title); content.appendChild(linkBox); content.appendChild(btn);
                 card.appendChild(img); card.appendChild(content);
                 cardsArea.appendChild(card);
-            });
+            }
         } else {
             cardsArea.style.display = "none";
         }
 
-        // GRID GÖRÜNÜMÜ RENDER (HER ZAMAN VAR)
-        galleryArea.style.display = "block";
-        batchControls.style.display = "flex";
+        // GRID GÖRÜNÜMÜ RENDER
+        if (showGrid) {
+            galleryArea.style.display = "block";
+            batchControls.style.display = "flex";
 
-        // Info Tip (Eğer kapatılmadıysa)
-        if (!isTipClosed) infoTip.style.display = "block"; else infoTip.style.display = "none";
+            // Info Tip Gösterimi (Grid ilk kez açılıyorsa ve kapalı değilse)
+            if (!isTipClosed && !isExpertUser) infoTip.style.display = "block"; 
+            else infoTip.style.display = "none";
 
-        btnClearAll.innerText = t.btnClear;
+            // Başlık
+            galleryLabel.innerText = t.galleryTitleAll;
+            btnClearAll.innerText = t.btnClear;
 
-        if(selectedIndices.length > 0) {
-            btnDelSel.style.display = "block";
-            btnDelSel.innerText = t.btnDeleteSelected + " (" + selectedIndices.length + ")";
-        } else {
-            btnDelSel.style.display = "none";
-        }
-
-        history.forEach((item, index) => {
-            let div = document.createElement("div"); div.className = "gallery-item";
-            
-            // FLASH HIGHLIGHT (Sadece yeni eklenenlerde)
-            if (lastAddedIds.includes(item.id)) {
-                div.classList.add("temp-highlight");
-                setTimeout(() => div.classList.remove("temp-highlight"), 2500);
+            if(selectedIndices.length > 0) {
+                btnDelSel.style.display = "block";
+                btnDelSel.innerText = t.btnDeleteSelected + " (" + selectedIndices.length + ")";
+            } else {
+                btnDelSel.style.display = "none";
             }
-            
-            if (selectedIndices.includes(index)) div.classList.add("selected-item");
 
-            let img = document.createElement("img"); img.src = item.directLink;
-            div.onclick = (e) => {
-                if(e.ctrlKey || e.metaKey) { toggleSelection(index); } else { openLightbox(index); }
-            };
+            history.forEach((item, index) => {
+                let div = document.createElement("div"); div.className = "gallery-item";
+                
+                // FLASH HIGHLIGHT (Sadece yeni eklenenlerde)
+                if (lastAddedIds.includes(item.id)) {
+                    div.classList.add("temp-highlight");
+                    setTimeout(() => div.classList.remove("temp-highlight"), 2500);
+                }
+                
+                if (selectedIndices.includes(index)) div.classList.add("selected-item");
 
-            let btn = document.createElement("div"); btn.className = "overlay-copy-btn";
-            btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>';
-            btn.onclick = (e) => { 
-                e.stopPropagation(); 
-                copyDirect(item.directLink, btn, img); 
-                // EXPERT CHECK: Buradan kopyalayan kullanıcı grid kullanmayı biliyordur
-                setExpertUser();
-            };
-            div.appendChild(img); div.appendChild(btn); galleryGrid.appendChild(div);
-        });
+                let img = document.createElement("img"); img.src = item.directLink;
+                div.onclick = (e) => {
+                    if(e.ctrlKey || e.metaKey) { toggleSelection(index); } else { openLightbox(index); }
+                };
+
+                let btn = document.createElement("div"); btn.className = "overlay-copy-btn";
+                btn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>';
+                btn.onclick = (e) => { 
+                    e.stopPropagation(); 
+                    copyDirect(item.directLink, btn, img); 
+                    // Izgara üzerindeki butonu kullanmak EXPERT hareketidir
+                    setExpertUser();
+                };
+                div.appendChild(img); div.appendChild(btn); galleryGrid.appendChild(div);
+            });
+        } else {
+            galleryArea.style.display = "none";
+        }
     }
 
     function toggleSelection(index) {
@@ -681,7 +645,7 @@
         let allImgs = history.map(h => h.directLink);
         showConfirm(t.confirmDelAll, allImgs, function() {
             history = []; lastAddedIds = []; selectedIndices = [];
-            // Temizleme işlemi de bir öğrenme sürecidir, uyarıyı kapat
+            conversionCount = 0; // Reset state
             closeInfoTip(); 
             updateUI();
             document.getElementById("driveLink").value = "";
