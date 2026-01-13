@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Gallery Pro V23</title>
+    <title>Drive Gallery Pro V24</title>
     <style>
         /* --- TEMEL AYARLAR --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
-        .container { position: relative; max-width: 850px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .container { position: relative; max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .label { font-weight: bold; margin-top: 15px; display: block; margin-bottom: 5px; color: #333; }
 
         /* --- DİL MENÜSÜ --- */
@@ -117,6 +117,7 @@
 
         .hide-nav .lb-btn, .hide-nav .lb-right-group { display: none !important; }
 
+        /* Alt Kontrol Barı */
         .lb-bottom-bar {
             position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
             display: flex; justify-content: space-between; align-items: center;
@@ -164,42 +165,57 @@
         /* --- DETAY TABLOSU --- */
         .details-modal-content {
             background-color: #fefefe; margin: 5% auto; border: 1px solid #888;
-            width: 90%; max-width: 900px; border-radius: 8px; display: flex; flex-direction: column; max-height: 90vh;
+            width: 90%; max-width: 800px; /* Biraz daralttık */
+            border-radius: 8px; display: flex; flex-direction: column; max-height: 90vh;
         }
         .details-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .details-body { overflow-y: auto; padding: 20px; }
+        
+        /* SCROLLBAR TASARIMI */
+        .details-body { 
+            overflow-y: auto; padding: 20px; 
+            /* Firefox */
+            scrollbar-width: thin; scrollbar-color: #ccc #f1f1f1;
+        }
+        /* Chrome/Edge/Safari */
+        .details-body::-webkit-scrollbar { width: 8px; }
+        .details-body::-webkit-scrollbar-track { background: #f1f1f1; }
+        .details-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        .details-body::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
         .details-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; background: #f9f9f9; border-radius: 0 0 8px 8px; }
         .close-details { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
         .close-details:hover { color: black; }
 
-        /* TABLO YAPISI (DÜZELTİLDİ: Resim Büyüdü, Boşluk Eşitlendi) */
+        /* TABLO YAPISI (GRID - SIKI DÜZEN) */
         .link-list-container { display: flex; flex-direction: column; gap: 10px; }
         .link-row { 
             display: grid; 
-            /* Sütunlar: Resim (80px) | Link | Kopyala | Sil */
-            grid-template-columns: 80px 1fr auto auto; 
-            gap: 15px; /* EŞİT BOŞLUK */
+            /* 80px Resim | 340px Sabit Link | Auto Kopyala | Auto Sil */
+            grid-template-columns: 80px 340px auto auto; 
+            gap: 15px; /* EŞİT MESAFE (User Request) */
             align-items: center; 
+            justify-content: center; /* ORTALA */
             border-bottom: 1px solid #eee; 
             padding-bottom: 10px; 
         }
         .link-row:last-child { border-bottom: none; }
         
         .link-header { 
-            display: grid; grid-template-columns: 80px 1fr auto auto; gap: 15px; 
+            display: grid; grid-template-columns: 80px 340px auto auto; gap: 15px; 
             background: #f2f2f2; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 5px;
+            justify-content: center; /* BAŞLIĞI DA ORTALA */
         }
 
         .tbl-thumb { 
-            width: 80px; height: 80px; /* RESİM ALANI ARTTIRILDI */
+            width: 80px; height: 80px; 
             object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; 
         }
         
         .link-text-wrapper {
             overflow: hidden; 
             background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 4px;
-            display: flex; align-items: center; min-width: 0;
-            max-width: 400px; 
+            display: flex; align-items: center; 
+            width: 100%; height: 40px; /* Yükseklik sabitleme */
         }
         .link-text {
             overflow-x: auto; white-space: nowrap; 
@@ -646,7 +662,7 @@
         if (e.key.toLowerCase() === "c") copyFromLightbox();
         if (e.key === "Delete" || e.key === "Backspace") deleteFromLightbox();
         
-        // Klavye ile Continuous Zoom
+        // Klavye ile Continuous Zoom (Long Press Logic)
         if ((e.key === "+" || e.key === "Add" || e.key === "-" || e.key === "Subtract") && !e.repeat) {
             if (activeZoomKey) return; 
             activeZoomKey = e.key;
@@ -655,6 +671,7 @@
         }
     }
     
+    // Keyup ile zoom durdurma
     document.addEventListener('keyup', (e) => {
         if (e.key === activeZoomKey || e.key === "+" || e.key === "Add" || e.key === "-" || e.key === "Subtract") {
             stopZoom();
