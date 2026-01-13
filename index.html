@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Gallery Pro V28</title>
+    <title>Drive Gallery Pro V29</title>
     <style>
         /* --- TEMEL AYARLAR --- */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f4f4f4; margin: 0; }
@@ -41,7 +41,7 @@
         .paste-btn:hover { background-color: #5c636a; }
         .paste-btn svg { width: 22px; height: 22px; fill: white; }
 
-        /* --- SETTINGS BAR (SWITCH) --- */
+        /* --- SETTINGS BAR --- */
         .settings-bar { display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; margin-right: 8px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -91,15 +91,16 @@
         .card-copy-btn:hover { background-color: #e36906; }
         .reset-btn-container { text-align: right; margin-top: 10px; }
 
-        /* --- GALERİ GRID (>3 ITEMS) --- */
+        /* --- GALERİ GRID --- */
         #galleryArea { margin-top: 20px; display: none; }
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-top: 10px; }
         .gallery-item {
             position: relative; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; aspect-ratio: 1; background: #eee;
             cursor: zoom-in; transition: transform 0.2s, border-color 0.2s;
+            user-select: none;
         }
         .gallery-item:hover { transform: scale(1.02); }
-        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.2s; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: filter 0.2s; pointer-events: none; }
         
         @keyframes flashEffect { 0% { filter: brightness(1); } 50% { filter: brightness(1.8) sepia(0.5) hue-rotate(90deg); } 100% { filter: brightness(1); } }
         .flash-anim { animation: flashEffect 0.4s ease-out; }
@@ -111,7 +112,7 @@
             position: absolute; top: 5px; right: 5px; background: rgba(255, 255, 255, 0.9);
             border: 1px solid #ccc; border-radius: 50%; width: 28px; height: 28px;
             display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0;
-            transition: opacity 0.2s, background-color 0.2s; z-index: 5;
+            transition: opacity 0.2s, background-color 0.2s; z-index: 5; pointer-events: auto;
         }
         .gallery-item:hover .overlay-copy-btn { opacity: 1; }
         .overlay-copy-btn:hover { background: #fd7e14; border-color: #fd7e14; color: white; }
@@ -154,7 +155,6 @@
         .lb-btn:hover { background: rgba(255,255,255,0.4); }
         .lb-btn.key-active, .lb-btn:active { transform: translateY(-50%) scale(0.9) !important; background: rgba(255,255,255,0.6); }
         .lb-prev { left: 20px; } .lb-next { right: 20px; }
-
         .hide-nav .lb-btn, .hide-nav .lb-right-group { display: none !important; }
 
         .lb-bottom-bar {
@@ -179,8 +179,7 @@
 
         .lb-zoom-btn {
             background: rgba(255,255,255,0.2); color: white; border: none; width: 35px; height: 35px;
-            cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
-            user-select: none;
+            cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; user-select: none;
         }
         .lb-zoom-btn:hover { background: rgba(255,255,255,0.4); }
         .lb-zoom-btn:active { background: rgba(255,255,255,0.6); }
@@ -207,11 +206,16 @@
             width: 90%; max-width: 800px; border-radius: 8px; display: flex; flex-direction: column; max-height: 90vh;
         }
         .details-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-        .details-body { overflow-y: auto; padding: 20px; scrollbar-width: thin; scrollbar-color: #ccc #f1f1f1; }
+        
+        .details-body { 
+            overflow-y: auto; padding: 20px; 
+            scrollbar-width: thin; scrollbar-color: #ccc #f1f1f1;
+        }
         .details-body::-webkit-scrollbar { width: 8px; }
         .details-body::-webkit-scrollbar-track { background: #f1f1f1; }
         .details-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
         .details-body::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
         .details-footer { padding: 15px 20px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; background: #f9f9f9; border-radius: 0 0 8px 8px; }
         .close-details { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; line-height: 1; }
         .close-details:hover { color: black; }
@@ -225,12 +229,15 @@
             border-bottom: 1px solid #eee; padding-bottom: 10px; 
         }
         .link-row:last-child { border-bottom: none; }
+        
         .link-header { 
             display: grid; grid-template-columns: 80px 340px auto auto; gap: 15px; 
             background: #f2f2f2; padding: 10px; font-weight: bold; border-radius: 4px; margin-bottom: 5px;
             justify-content: center;
         }
+
         .tbl-thumb { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; cursor: zoom-in; display: block; }
+        
         .link-text-wrapper {
             overflow: hidden; background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 4px;
             display: flex; align-items: center; min-width: 0; max-width: 400px; 
@@ -394,6 +401,7 @@
     let currentZoom = 1; 
     let navPreference = 'mid'; 
     let isHistoryEnabled = true; 
+    let previousHistoryCount = 0; // State before conversion
     navPreference = Math.random() > 0.5 ? 'mid' : 'bot';
     let zoomInterval = null; 
     const driveRegex = /drive\.google\.com\/.*?\/d\/([a-zA-Z0-9_-]{25,})/;
@@ -435,7 +443,7 @@
 
     function toggleHistoryMode() {
         isHistoryEnabled = document.getElementById("historySwitch").checked;
-        updateUI(); // Arayüzü yenile (Buton metinleri değişebilir)
+        updateUI(); 
     }
 
     function applyTranslations() {
@@ -445,7 +453,7 @@
         let lbCopy = document.getElementById('lbCopyBtn'); if(!lbCopy.innerText.includes("!")) lbCopy.innerText = t.btnCopy;
         var btnConvert = document.getElementById('btnConvert'); if (!btnConvert.classList.contains('error-shake')) btnConvert.innerText = t.btnConvert;
         if(document.getElementById("detailsModal").style.display === "block") showDetails(); 
-        updateUI(); // Dinamik butonlar için
+        updateUI();
     }
 
     function closeIfBackdrop(e, modalId) {
@@ -471,12 +479,16 @@
 
         let links = rawInput.split(',').map(s => s.trim()).filter(s => s !== "");
         let hasValidLink = false;
-        lastAddedIds = []; 
-
+        
+        // Ekleme öncesi state'i kaydet
+        previousHistoryCount = isHistoryEnabled ? history.length : 0;
+        
         if(!isHistoryEnabled) {
             history = [];
             selectedIndices = [];
         }
+
+        lastAddedIds = []; 
 
         links.forEach(val => {
             if (val.match(/\/d\/(.+?)\//) && !val.startsWith("http")) val = "https://" + val;
@@ -496,7 +508,7 @@
         dinamikModAktif = false; btn.classList.add("success-lock");
     }
 
-    // --- ANA UI FONKSİYONU ---
+    // --- UI GÜNCELLEME (MANTIK MERKEZİ) ---
     function updateUI() {
         const cardsArea = document.getElementById("cardsArea");
         const galleryArea = document.getElementById("galleryArea");
@@ -515,19 +527,40 @@
             return;
         }
 
-        // HİBRİT MOD KONTROLÜ: Sayı <= 3 ise Kart Görünümü
-        if (history.length <= 3) {
-            cardsArea.style.display = "block";
-            galleryArea.style.display = "none";
+        // HİBRİT MOD MANTIĞI (DUAL VIEW)
+        // Eğer (History Kapalı/Boşsa VE Toplam<=3) VEYA (Append Mode VE Yeni Eklenen<=3) -> Kartları Göster
+        let showCards = false;
+        let newItemsCount = lastAddedIds.length;
 
-            history.forEach((item, index) => {
+        if (!isHistoryEnabled || previousHistoryCount === 0) {
+            if (history.length <= 3) showCards = true;
+        } else {
+            // Var olan listeye ekleme yapıldı
+            if (newItemsCount <= 3) showCards = true;
+        }
+
+        // KART GÖRÜNÜMÜ OLUŞTURMA
+        if (showCards) {
+            cardsArea.style.display = "block";
+            
+            // Sadece son eklenenleri kart olarak göster (Append mode ise)
+            let itemsToShowInCards = (!isHistoryEnabled || previousHistoryCount === 0) ? history : history.filter(item => lastAddedIds.includes(item.id));
+
+            itemsToShowInCards.forEach((item, index) => {
                 let card = document.createElement("div"); card.className = "result-card";
                 
-                let titleText = history.length > 1 ? (index + 1) + ". " + t.thImage : t.modalTitle.split(" ")[0]; // Basit isimlendirme
-                if (history.length === 1) titleText = "Direkt Resim Linki"; // Tekil için özel
+                // İsimlendirme Mantığı
+                let titleText;
+                if (itemsToShowInCards.length === 1) {
+                    titleText = "Direkt Resim Linkin";
+                } else {
+                    titleText = (index + 1) + ". " + t.thImage;
+                }
 
                 let img = document.createElement("img"); img.src = item.directLink; img.className = "card-thumb";
-                img.onclick = () => openLightbox(index);
+                // Karttan tıklandığında global indexini bul
+                let globalIndex = history.findIndex(h => h.id === item.id);
+                img.onclick = () => openLightbox(globalIndex);
 
                 let content = document.createElement("div"); content.className = "card-content";
                 let title = document.createElement("div"); title.className = "card-title"; title.innerText = titleText;
@@ -543,33 +576,34 @@
                     });
                 };
 
-                content.appendChild(title);
-                content.appendChild(linkBox);
-                content.appendChild(btn);
-                card.appendChild(img);
-                card.appendChild(content);
+                content.appendChild(title); content.appendChild(linkBox); content.appendChild(btn);
+                card.appendChild(img); card.appendChild(content);
                 cardsArea.appendChild(card);
             });
 
-            // SIFIRLA BUTONU (Sadece Kart Modunda ve History Kapalıysa veya kullanıcı isterse)
-            // Kullanıcı "öncekileri kaydet kapalıyken" dedi ama genel bir Reset butonu kart modunda iyi olur.
-            if(!isHistoryEnabled) {
+            // SIFIRLA BUTONU (Sadece Fresh Mode için)
+            if(!isHistoryEnabled || previousHistoryCount === 0) {
                 let resetDiv = document.createElement("div"); resetDiv.className = "reset-btn-container";
                 let resetBtn = document.createElement("button"); 
                 resetBtn.className = "btn-outline-danger"; 
-                resetBtn.innerText = t.btnReset;
+                resetBtn.innerText = t.btnReset; // Sıfırla
                 resetBtn.onclick = confirmClearGallery;
                 resetDiv.appendChild(resetBtn);
                 cardsArea.appendChild(resetDiv);
             }
 
         } else {
-            // GRID MODU (>3)
             cardsArea.style.display = "none";
+        }
+
+        // GRID GÖRÜNÜMÜ (HER ZAMAN VAR, SADECE BAZEN GİZLİ)
+        // Eğer Kart Modu aktifse VE (History Kapalı veya Boşsa) -> Grid Gizli
+        if (showCards && (!isHistoryEnabled || previousHistoryCount === 0)) {
+            galleryArea.style.display = "none";
+        } else {
             galleryArea.style.display = "block";
             batchControls.style.display = "flex";
 
-            // Buton Metni Güncelleme
             if (!isHistoryEnabled) btnClearAll.innerText = t.btnReset;
             else btnClearAll.innerText = t.btnClear;
 
@@ -582,8 +616,16 @@
 
             history.forEach((item, index) => {
                 let div = document.createElement("div"); div.className = "gallery-item";
-                if(lastAddedIds.includes(item.id)) div.classList.add("active-item");
-                if(selectedIndices.includes(index)) div.classList.add("selected-item");
+                
+                // ÇERÇEVE MANTIĞI
+                let showBorder = false;
+                if (isHistoryEnabled && previousHistoryCount > 0) {
+                    // Sadece Yığın modu (>3) ise çerçevele
+                    if (newItemsCount > 3 && lastAddedIds.includes(item.id)) showBorder = true;
+                }
+                
+                if (showBorder) div.classList.add("active-item");
+                if (selectedIndices.includes(index)) div.classList.add("selected-item");
 
                 let img = document.createElement("img"); img.src = item.directLink;
                 div.onclick = (e) => {
@@ -649,6 +691,7 @@
         let allImgs = history.map(h => h.directLink);
         showConfirm(t.confirmDelAll, allImgs, function() {
             history = []; lastAddedIds = []; selectedIndices = [];
+            previousHistoryCount = 0; // Reset state
             updateUI();
             document.getElementById("driveLink").value = "";
             document.getElementById("btnConvert").classList.remove("success-lock");
@@ -677,6 +720,7 @@
         });
     }
 
+    // --- LIGHTBOX ---
     function openLightbox(index, fromSource = 'gallery') {
         activeLightboxIndex = index;
         updateLightboxContent();
